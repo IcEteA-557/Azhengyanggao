@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>J8 Lab 3 检查点达成指南</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="zh guide">
+
+<div class="title-page">
+  <div class="univ">香港QS No.2大学</div>
+  <div class="dept">J8学系</div>
+  <div class="rule"></div>
+  <div class="course">J8课程</div>
+  <div class="kind">检查点达成指南</div>
+  <div class="labno">J8 Lab 3</div>
+  <div class="labtitle">今晚的实验流程、演示话术与故障排查</div>
+  <div class="meta">2026/27 学年 A 学期<br>课程主任：Prof. IcEteA<br><br>姓名：<b>IcEteA So Handsome</b>　学号：<b>91786767</b><br>日期：<b>2026 年 11 月 16 日</b></div>
+</div>
+
+<h1>1. 今晚怎么用这份指南</h1>
+<p>这份指南按“进实验室之前 → 现场演示 → 交报告之前”的顺序写。Lab 3 有 4 个检查点：<b>检查点 1、2、4 要当场给演示者看</b>，检查点 3 只写在报告里，不需要现场演示。每个检查点下面都写了“做什么、算通过的标准、要留下什么证据”，最后还有演示时可以直接照着说的话。</p>
+<p>建议今晚的顺序是：先建工程并跑通仿真（检查点 1），再综合、实现、下载并测板级（检查点 2），然后接逻辑分析仪（检查点 4），最后用剩下的时间补截图和报告（检查点 3）。不要先接逻辑分析仪，因为板级设计没下载成功时，分析仪上什么也看不到。</p>
+<figure><img src="figs/fig_flow.svg" alt=""><figcaption>图 1. 今晚的流程：写 VHDL → 仿真 → 综合 → 实现 → 下载 → 验证。</figcaption></figure>
+
+<h1>2. 先看这四件事</h1>
+<div class="tabcap">表 1. 四个检查点：做什么、怎样算通过、谁来看。</div>
+<table class=""><thead><tr><th>检查点</th><th>要做什么</th><th>算通过的标准</th><th>谁看</th></tr></thead><tbody><tr><td>CP1</td><td>仿真 ADD、AND、XOR、SHR 四段</td><td>四段结果分别为 000/001/110/010；carry 只在 ADD 为 1；dup 与主输出一致</td><td>演示者</td></tr>
+<tr><td>CP2</td><td>下载后测 10 组输入</td><td>LED 与表 4 一致，能解释 7+1 的 1000 和 7+7 的 1110</td><td>演示者</td></tr>
+<tr><td>CP3</td><td>报告写 7 种运算的改法</td><td>有运算表、代码片段、进位与保留编码的说明</td><td>报告评分</td></tr>
+<tr><td>CP4</td><td>逻辑分析仪抓 D0–D3</td><td>能指出触发通道、采样率、D3 何时为 1</td><td>演示者</td></tr>
+</tbody></table>
+
+<p>最容易丢分的地方不是代码，而是“做出来了但讲不清”。演示时每个检查点用 30–60 秒说清楚三件事：我做了什么、预期是什么、实际看到什么。下面每一节都给出可以直接使用的说法。</p>
+
+<h1>3. 开工前 10 分钟</h1>
+<h2>3.1 把文件放好</h2>
+<p>从 GitHub 仓库下载整个 <code>lab3</code> 文件夹（或 <code>git clone</code>），确认下面这些文件都在：</p>
+<div class="tabcap">表 2. 仓库里每个文件是干什么的。</div>
+<table class=""><thead><tr><th>文件</th><th>用途</th><th>今晚什么时候用</th></tr></thead><tbody><tr><td>EE2000_Lab3_中文版.pdf</td><td>中文实验手册</td><td>到场前/现场查要求</td></tr>
+<tr><td>EE2000_Lab3_Report.pdf</td><td>英文报告（完整草稿）</td><td>写报告、对照表</td></tr>
+<tr><td>EE2000_Lab3_Report_中文版.pdf</td><td>中文报告（完整草稿）</td><td>写中文报告</td></tr>
+<tr><td>EE2000_Lab3_检查点达成指南.pdf</td><td>本指南</td><td>现场照着做</td></tr>
+<tr><td>src/alu.vhd</td><td>3 位 ALU 设计</td><td>CP1、CP2</td></tr>
+<tr><td>src/alu_tb.vhd</td><td>四段激励的测试平台</td><td>CP1</td></tr>
+<tr><td>src/alu.xdc</td><td>Basys 3 引脚约束</td><td>CP2</td></tr>
+<tr><td>src/create_project.tcl</td><td>一键建 Vivado 工程</td><td>开工</td></tr>
+<tr><td>src/alu_7ops.vhd</td><td>七种运算的扩展设计</td><td>CP3</td></tr>
+<tr><td>src/alu_7ops_tb.vhd</td><td>七运算测试平台</td><td>CP3（可选）</td></tr>
+<tr><td>src/alu_expected.csv</td><td>256 组预期值</td><td>核对/写报告</td></tr>
+</tbody></table>
+
+<h2>3.2 建工程</h2>
+<p>两种方式选一种。第一种最省事：打开 Vivado 的 Tcl Console，<code>cd</code> 到 <code>lab3/src</code>，执行：</p>
+<pre class="code">source create_project.tcl</pre>
+<p>它会创建 <code>lab3_alu</code> 工程，器件设为 <code>xc7a35tcpg236-1</code>，并加入 <code>alu.vhd</code>、<code>alu_tb.vhd</code>、<code>alu.xdc</code>，顶层设为 <code>ALU</code>。如果 Tcl 脚本因为路径或权限失败，就用手动方式：新建工程 → 选对器件 → Add Sources 加三个文件 → 把 <code>ALU</code> 设为顶层。</p>
+<p>检查三件事：</p>
+<ol>
+<li>器件是 <code>xc7a35tcpg236-1</code>（Basys 3）。手册里可能写成 <code>xc7a35ticpg236-1L</code>，以 Vivado 器件列表里的 <code>xc7a35tcpg236-1</code> 为准。</li>
+<li><code>alu.vhd</code> 的实体名是 <code>ALU</code>，与文件名一致。</li>
+<li><code>alu.xdc</code> 已经在 Constraints 里，没有被 disable。</li>
+</ol>
+<figure><img src="figs/fig_board.svg" alt=""><figcaption>图 2. Basys 3 的开关、LED 和 JA 排针；A 在 SW0–SW2，B 在 SW3–SW5，op 在 SW6–SW7。</figcaption></figure>
+
+<h1>4. GitHub 仓库怎么用</h1>
+<p>仓库地址：<a href="https://github.com/IcEteA-557/Azhengyanggao">https://github.com/IcEteA-557/Azhengyanggao</a>。仓库是公开的，里面就是 <code>lab3</code> 的全套文件。今晚在实验室里最稳的做法是提前把整个文件夹下载到本机（GitHub 页面 → Code → Download ZIP），不要依赖实验室网络。</p>
+<h2>4.1 第一次把文件推上去</h2>
+<p>如果仓库还是空的，在 <code>lab3</code> 文件夹里执行（方案 A，推荐：仓库根目录就是 lab3 的内容，GitHub 首页会直接显示 README）：</p>
+<pre class="code">cd lab3
+git init
+git add .
+git commit -m "J8 Lab 3: ALU design, reports and guide"
+git branch -M main
+git remote add origin https://github.com/IcEteA-557/Azhengyanggao.git
+git push -u origin main</pre>
+<p>如果你想把整个 <code>lab</code>（包含 lab1、lab2、lab3）作为一个仓库（方案 B）：</p>
+<pre class="code">cd lab
+git init
+git add lab3
+git commit -m "J8 Lab 3"
+git branch -M main
+git remote add origin https://github.com/IcEteA-557/Azhengyanggao.git
+git push -u origin main</pre>
+<p>方案 B 的仓库首页不会自动显示 <code>lab3/README.md</code>，需要点进 <code>lab3</code> 才能看到；方案 A 更适合“今晚给同学/自己看”的用法。两种方案里 README 的相对链接都能用，因为 README 与 <code>src/</code>、PDF 在同一层。</p>
+<div class="warn"><b>公开仓库提醒：</b>报告封面有学号 91786767，中文手册里含有课程手册的原始截图。如果不想公开这些内容，可以把仓库改成 private，或删除中文手册 PDF、把学号改成占位符后再推。不要把 Vivado 的工程缓存（<code>.Xil/</code>、<code>*.jou</code>、<code>*.log</code>、<code>*.bit</code>）一起提交；仓库里的 <code>.gitignore</code> 已经排除了它们。</div>
+<h2>4.2 现场怎么用仓库</h2>
+<ul>
+<li>只看要求：打开 <code>EE2000_Lab3_中文版.pdf</code> 或本指南。</li>
+<li>建工程：用 <code>src/create_project.tcl</code>，或手动加 <code>src/alu.vhd</code>、<code>src/alu_tb.vhd</code>、<code>src/alu.xdc</code>。</li>
+<li>写报告：直接以 <code>EE2000_Lab3_Report_中文版.pdf</code> 为底稿，把“预期”改成实测，补自己的截图。</li>
+<li>检查点 3：<code>src/alu_7ops.vhd</code> 和报告里的表 6、代码清单 3 已经写好，照着讲即可。</li>
+</ul>
+
+<h1>5. 检查点 1：仿真</h1>
+<h2>5.1 跑起来</h2>
+<ol>
+<li>在 Sources 面板把 <code>alu_tb</code> 设为 Simulation Top（右键 → Set as Top），或在 Tcl Console 执行 <code>set_property top alu_tb [get_filesets sim_1]</code>。</li>
+<li>Flow → Run Simulation → Run Behavioral Simulation；或执行 <code>launch_simulation</code>、<code>run all</code>。</li>
+<li>在波形窗口把 <code>A</code>、<code>B</code>、<code>op</code>、<code>result</code>、<code>carry</code>、<code>dup_result</code>、<code>dup_carry</code> 都加进来，Radix 设为 Binary。</li>
+<li>Zoom Fit，检查 0–10、10–20、20–30、30–40 ns 四段。</li>
+</ol>
+<div class="tabcap">表 3. 检查点 1 的预期值（A=101，B=011）。</div>
+<table class=""><thead><tr><th>时间段</th><th>op</th><th>运算</th><th>result</th><th>carry</th><th>dup_result</th><th>dup_carry</th></tr></thead><tbody><tr><td>0–10 ns</td><td>00</td><td>ADD</td><td>000</td><td>1</td><td>000</td><td>1</td></tr>
+<tr><td>10–20 ns</td><td>01</td><td>AND</td><td>001</td><td>0</td><td>001</td><td>0</td></tr>
+<tr><td>20–30 ns</td><td>10</td><td>XOR</td><td>110</td><td>0</td><td>110</td><td>0</td></tr>
+<tr><td>30–40 ns</td><td>11</td><td>SHR</td><td>010</td><td>0</td><td>010</td><td>0</td></tr>
+</tbody></table>
+
+<h2>5.2 要截什么图</h2>
+<p>截两张：一张是 <code>alu_tb.vhd</code> 的代码窗口（能看出四段 <code>wait for 10 ns</code>），一张是完整波形窗口（能看出四段结果和 carry）。文件名建议 <code>cp1_tb.png</code>、<code>cp1_waveform.png</code>。如果演示者只看一张，就给波形，但要能指着说“这一段是 ADD，carry 在这里为 1”。</p>
+<div class="say"><b>演示时这样说：</b>“这是测试平台，四段激励分别是 ADD、AND、XOR、SHR。A 固定为 101、B 固定为 011，所以结果依次是 000 带进位 1、001、110、010。carry 只在加法段为 1；dup_result 和 dup_carry 是给 JA 的副本，和主输出完全一致。”</div>
+<p>如果被问“为什么不用随机激励”：四段定值是为了让四个结果互不相同，操作码接反时一眼能看出来；随机激励适合跑覆盖率，不适合 30 秒演示。</p>
+
+<h1>6. 检查点 2：上板</h1>
+<h2>6.1 生成并下载</h2>
+<ol>
+<li>Flow → Run Synthesis；完成后 Run Implementation；再 Generate Bitstream。</li>
+<li>Open Hardware Manager → Open Target → Auto Connect。</li>
+<li>Program Device，选择 <code>lab3_alu.bit</code>，点 Program。</li>
+<li>如果 Auto Connect 找不到板子：确认板子电源开关、USB 线是数据线而不是仅充电线、Vivado 的 cable driver 已安装；Windows 下可能需要装 Digilent 的 cable driver。</li>
+</ol>
+<h2>6.2 测这 10 组</h2>
+<p>按表 4 拨开关。开关模式按 SW7 到 SW0 写，具体哪个物理开关对应哪一位，以板上印的标签为准；不要从左往右数。每测完一组，在“实测”一栏打勾，并在报告里把“预期”改成你实际看到的模式。</p>
+<div class="tabcap">表 4. 板级 10 组用例（A、B、op → result、carry、LED）。</div>
+<table class=""><thead><tr><th>#</th><th>A</th><th>B</th><th>op</th><th>result</th><th>carry</th><th>LD3..LD0</th><th>SW7..SW0</th></tr></thead><tbody><tr><td>1</td><td>011</td><td>010</td><td>00</td><td>101</td><td>0</td><td>0101</td><td>00 010 011</td></tr>
+<tr><td>2</td><td>111</td><td>001</td><td>00</td><td>000</td><td>1</td><td>1000</td><td>00 001 111</td></tr>
+<tr><td>3</td><td>110</td><td>011</td><td>00</td><td>001</td><td>1</td><td>1001</td><td>00 011 110</td></tr>
+<tr><td>4</td><td>111</td><td>111</td><td>00</td><td>110</td><td>1</td><td>1110</td><td>00 111 111</td></tr>
+<tr><td>5</td><td>110</td><td>101</td><td>01</td><td>100</td><td>0</td><td>0100</td><td>01 101 110</td></tr>
+<tr><td>6</td><td>101</td><td>011</td><td>01</td><td>001</td><td>0</td><td>0001</td><td>01 011 101</td></tr>
+<tr><td>7</td><td>101</td><td>011</td><td>10</td><td>110</td><td>0</td><td>0110</td><td>10 011 101</td></tr>
+<tr><td>8</td><td>110</td><td>101</td><td>10</td><td>011</td><td>0</td><td>0011</td><td>10 101 110</td></tr>
+<tr><td>9</td><td>101</td><td>000</td><td>11</td><td>010</td><td>0</td><td>0010</td><td>11 000 101</td></tr>
+<tr><td>10</td><td>111</td><td>000</td><td>11</td><td>011</td><td>0</td><td>0011</td><td>11 000 111</td></tr>
+</tbody></table>
+
+<p>两组最容易误判：</p>
+<ul>
+<li>7 + 1 = 8：result = 000，carry = 1，LED 是 <b>1000</b>，不是 0000。LD3 是进位。</li>
+<li>7 + 7 = 14：result = 110，carry = 1，LED 是 <b>1110</b>。</li>
+</ul>
+<p>拍一张照片：开关位置 + LED 同时入镜，最好能看出你正在测哪一组。文件名 <code>cp2_board.jpg</code>。</p>
+<div class="say"><b>演示时这样说：</b>“这是下载后的板子。A 在 SW0–SW2，B 在 SW3–SW5，op 在 SW6–SW7；LD0–LD2 是结果，LD3 是进位。这一组是 7+1，结果是 000、进位 1，所以 LED 显示 1000。这一组是 7+7，结果是 110、进位 1，显示 1110。”</div>
+<p>如果被问“为什么 7+1 的 LED 不是 0000”：因为 LD3 接的是 carry，不是 result 的第四位；result 只有三位。</p>
+
+<h1>7. 检查点 3：报告里的七种运算</h1>
+<p>这一项不现场演示，但要写在报告里。最简单的答法是：把 <code>op</code> 从 2 位扩到 3 位，输出选择从四选一变成八选一，加法器由 ADD 和 SUB 共用，移位组增加 SHL，保留编码 111 输出 000。</p>
+<div class="tabcap">表 5. 七种运算的编码。</div>
+<table class=""><thead><tr><th>op[2:0]</th><th>运算</th><th>result</th><th>carry</th></tr></thead><tbody><tr><td>000</td><td>ADD</td><td>(A+B) mod 8</td><td>A+B ≥ 8</td></tr>
+<tr><td>001</td><td>SUB</td><td>(A−B) mod 8</td><td>A ≥ B（无借位）</td></tr>
+<tr><td>010</td><td>AND</td><td>A and B</td><td>0</td></tr>
+<tr><td>011</td><td>OR</td><td>A or B</td><td>0</td></tr>
+<tr><td>100</td><td>XOR</td><td>A xor B</td><td>0</td></tr>
+<tr><td>101</td><td>SHR</td><td>A >> 1</td><td>0</td></tr>
+<tr><td>110</td><td>SHL</td><td>A << 1</td><td>0</td></tr>
+<tr><td>111</td><td>保留</td><td>000</td><td>0</td></tr>
+</tbody></table>
+
+<p>报告里至少写清三点：</p>
+<ol>
+<li><b>为什么要多一位：</b>2 位只有 4 个编码，7 种运算必须用 3 位；多出的 op[2] 接 SW8（V2），XDC 要加一行。</li>
+<li><b>SUB 的进位为什么取反：</b>减法用补码 <i>A</i> + (not <i>B</i>) + 1；<code>diff(3)=1</code> 表示 <i>A</i> &lt; <i>B</i>（有借位），所以 carry = <code>not diff(3)</code> 才是“无借位”。</li>
+<li><b>保留编码：</b>111 要给确定值 000、carry 0，不能写 <code>'Z'</code>；三态会推断出总线缓冲，不是内部多路选择器。</li>
+</ol>
+<p>代码用 <code>src/alu_7ops.vhd</code>，报告里贴 <code>result_t</code> 和 <code>carry_t</code> 两个选择赋值即可，不需要贴整个文件。图 3 可以用来解释数据通路。</p>
+<figure><img src="figs/fig_7ops.svg" alt=""><figcaption>图 3. 七运算数据通路：多一位 op、八选一、共用加减法单元。</figcaption></figure>
+
+<h1>8. 检查点 4：逻辑分析仪</h1>
+<h2>8.1 接线</h2>
+<p>先把板子设成 <i>A</i> = 000、<i>B</i> = 000、<i>op</i> = 00，再接线。接线顺序：</p>
+<ol>
+<li>黑线 → GND（PMOD 的 5 或 11 脚；不要接 6/12 脚的 VCC）。</li>
+<li>棕线 → JA1；红线 → JA2；橙线 → JA3；黄线 → JA4。</li>
+<li>逻辑分析仪 USB-C → 电脑。</li>
+</ol>
+<p>接好后先看一眼：黑线是否在 GND 那一列，而不是 VCC。接错会得到一条直线，甚至损坏输入。</p>
+<figure><img src="figs/manual/pmod_pinout.png" alt=""><figcaption>图 4. PMOD 引脚：5/11 是 GND，6/12 是 VCC，中间 8 个是信号。</figcaption></figure>
+
+<h2>8.2 PulseView 设置</h2>
+<ol>
+<li>打开 PulseView，选择设备（常见的是 <code>fx2lafw</code> 兼容的逻辑分析仪）。</li>
+<li>通道只开 D0–D3，分别对应 JA1–JA4。</li>
+<li>采样：5 M samples、1 MHz；如果下拉菜单没有这两个值，用 1 M samples、20 kHz（窗口更长，手拨更从容）。</li>
+<li>Trigger：D0，Rising edge。</li>
+<li>点 Run，然后从 <i>A</i> = 000 开始逐位拨到 111；再拨 <i>B</i> 到 001，让 <i>A</i> = 111，观察最后一次加法。</li>
+<li>点 Stop，Zoom Fit，截图。</li>
+</ol>
+<figure><img src="figs/manual/pulseview_settings.png" alt=""><figcaption>图 5. PulseView 的触发和采样设置。</figcaption></figure>
+<div class="tabcap">表 6. 通道对应关系。</div>
+<table class=""><thead><tr><th>通道</th><th>JA</th><th>信号</th><th>含义</th></tr></thead><tbody><tr><td>D0</td><td>JA1</td><td>dup_result[0]</td><td>结果最低位</td></tr>
+<tr><td>D1</td><td>JA2</td><td>dup_result[1]</td><td>结果第 1 位</td></tr>
+<tr><td>D2</td><td>JA3</td><td>dup_result[2]</td><td>结果最高位</td></tr>
+<tr><td>D3</td><td>JA4</td><td>dup_carry</td><td>进位</td></tr>
+</tbody></table>
+
+<h2>8.3 波形应该是什么样</h2>
+<p>前八步 <i>B</i> = 000，结果等于 <i>A</i>：D0 每步翻转，D1 每两步翻转，D2 每四步翻转，D3 一直是 0。最后一步 <i>A</i> = 111、<i>B</i> = 001，7 + 1 = 8，结果 000、进位 1，所以 D3 变高、D0–D2 变低。</p>
+<figure><img src="figs/fig_cp4.svg" alt=""><figcaption>图 6. 预期采集：A 从 000 到 111（B=000），然后 B=001、A=111。</figcaption></figure>
+
+<div class="say"><b>演示时这样说：</b>“黑线接 GND，棕红橙黄分别接 JA1–JA4。PulseView 用 D0 上升沿触发、1 MHz 采样、5 M 点。D0 是结果最低位，所以 A 每加一它就翻转；D1 每两步、D2 每四步翻转。最后 7+1=8 时，D3 进位变高，D0–D2 变低。”</div>
+<p>如果被问“为什么要触发”：手拨开关的时刻不确定，触发让采集从 JA1 的上升沿开始，波形才有稳定的起点；预触发样本还能看到触发前的一小段。</p>
+
+<h1>9. 故障排查</h1>
+<div class="tabcap">表 7. 常见现象与处理。</div>
+<table class=""><thead><tr><th>现象</th><th>可能原因</th><th>处理</th></tr></thead><tbody><tr><td>综合报 srl/sll 未定义</td><td>对 STD_LOGIC_VECTOR 直接移位</td><td>用 to_bitvector / to_stdlogicvector 转换</td></tr>
+<tr><td>仿真只有最后一段</td><td>进程末尾没有 wait，或没有 wait for</td><td>每段后 wait for 10 ns，末尾 wait;</td></tr>
+<tr><td>波形全是 X/U</td><td>信号没有初值，或端口映射错</td><td>给初值，改用具名关联</td></tr>
+<tr><td>实现报 unplaced ports</td><td>XDC 名字与 VHDL 不一致</td><td>改成 {A[0]} 这种带下标的名字</td></tr>
+<tr><td>DRC 报 IOSTANDARD</td><td>引脚缺电平标准</td><td>每个引脚加 IOSTANDARD LVCMOS33</td></tr>
+<tr><td>Hardware Manager 找不到板子</td><td>电源/线/驱动</td><td>开电源，换数据线，装 cable driver</td></tr>
+<tr><td>LED 全灭</td><td>没下载成功，或结果就是 000</td><td>看 LD3 进位；重新 Program</td></tr>
+<tr><td>LED 与开关不对应</td><td>开关组顺序记反</td><td>按板上标签，A0 是 SW0</td></tr>
+<tr><td>JA 没有信号</td><td>XDC 缺 JA，或没下载</td><td>检查 dup_result/dup_carry 约束</td></tr>
+<tr><td>PulseView 找不到设备</td><td>USB/驱动/设备选错</td><td>换线，重插，选 fx2lafw</td></tr>
+<tr><td>采集是直线</td><td>黑线接 VCC，或通道接错</td><td>黑线接 GND，核对 JA1–JA4</td></tr>
+<tr><td>触发不启动</td><td>边沿/通道设错</td><td>D0、Rising edge，先 Run 再拨开关</td></tr>
+<tr><td>窗口太短</td><td>采样率太高/点数太少</td><td>改 1 M @ 20 kHz</td></tr>
+<tr><td>台阶处有窄脉冲</td><td>开关抖动</td><td>正常现象，不是 ALU 故障</td></tr>
+</tbody></table>
+
+<h1>10. 进实验室前自查</h1>
+<ul class="checklist">
+<li>☐ 中文手册和本指南已下载到本机，能离线打开。</li>
+<li>☐ Vivado 工程能打开，器件是 xc7a35tcpg236-1，alu.vhd / alu_tb.vhd / alu.xdc 都在。</li>
+<li>☐ 仿真能跑出四段，知道 CP1 要截哪两张图。</li>
+<li>☐ 板子、USB 数据线、彩虹线、逻辑分析仪、PulseView 都准备好了。</li>
+<li>☐ 手机或截图工具可用。</li>
+<li>☐ 知道 CP1/CP2/CP4 要演示，CP3 只写报告。</li>
+<li>☐ 记得带学生证；报告封面要填姓名、学号、日期。</li>
+</ul>
+
+<h1>11. 交报告前检查</h1>
+<ul class="checklist">
+<li>☐ 封面：IcEteA So Handsome、91786767、2026 年 11 月 16 日（或实际提交日期）。</li>
+<li>☐ 表 1、2、4、5、6、7 都在，编号连续。</li>
+<li>☐ 图 1–5 都在，图注完整。</li>
+<li>☐ CP1 有波形截图或矢量图；CP2 有实测表和照片；CP4 有分析仪截图。</li>
+<li>☐ CP3 有七运算表、代码片段、SUB 进位和保留编码的解释。</li>
+<li>☐ 结论里写了遇到的问题和修正方法，不是只抄步骤。</li>
+<li>☐ 文件名与 lab2 风格一致：<code>EE2000_Lab3_Report.pdf</code> / <code>EE2000_Lab3_Report_中文版.pdf</code>。</li>
+</ul>
+<p class="small">本指南中的板级结果和逻辑分析仪波形是按设计推算的预期值；做完实验后，请用你实际看到的 LED 模式、照片和波形替换报告中的对应内容，再提交。</p>
+
+</body>
+</html>

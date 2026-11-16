@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>J8 实验手册三 — 简易 ALU 设计</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="zh manual">
+
+<div class="title-page">
+  <div class="univ">香港QS No.2大学</div>
+  <div class="dept">J8学系</div>
+  <div class="rule"></div>
+  <div class="course">J8课程</div>
+  <div class="kind">实验手册三</div>
+  <div class="labno">简易 ALU 设计</div>
+  <div class="labtitle">组合逻辑、VHDL 类型转换与逻辑分析仪</div>
+  <div class="meta">2026/27 学年 A 学期<br>课程主任：Prof. IcEteA<br><br>姓名：<b>IcEteA So Handsome</b>　学号：<b>91786767</b><br>日期：<b>2026 年 11 月 16 日</b></div>
+</div>
+
+<h1>实验目的</h1>
+<p>本实验的目标是设计一个简单的算术逻辑单元（ALU），用它复习组合逻辑设计，并练习 VHDL 中的类型转换、位切片与拼接。实验分为两部分：实验 1 设计并验证一个 3 位 ALU；实验 2 用逻辑分析仪观察 ALU 的内部信号。</p>
+<p>完成本实验后，你应该能够：</p>
+<ul>
+<li>把运算表转换成 VHDL 的选择赋值；</li>
+<li>使用 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 的切片与拼接，并在需要时显式转换到 <font face="Menlo, monospace">BIT_VECTOR</font> 做移位；</li>
+<li>用测试平台产生多组激励，并在波形窗口中核对结果与进位；</li>
+<li>编写 XDC，把信号分配到 Basys 3 的开关、LED 和 JA 排针；</li>
+<li>用逻辑分析仪和 PulseView 观察并行信号，并解释触发与采样设置。</li>
+</ul>
+<p>本实验有 4 个检查点。检查点 1、2、4 需要向演示者展示；检查点 3 写在实验报告中，不需要现场演示。</p>
+
+<h1>实验 1：设计 3 位 ALU</h1>
+<p>本实验要设计一个 3 位 ALU。输入是 <i>A</i>[2:0]、<i>B</i>[2:0] 和操作码 <i>op</i>[1:0]；输出是 <i>result</i>[2:0] 和 <i>carry</i>。ALU 根据 <i>op</i> 执行表 1 中的一种运算。</p>
+<div class="tabcap">表 1. 3 位 ALU 的运算。</div>
+<table class=""><thead><tr><th>op[1:0]</th><th>运算</th><th>说明</th><th>carry</th></tr></thead><tbody><tr><td>00</td><td>ADD</td><td>A 加 B</td><td>由和决定</td></tr>
+<tr><td>01</td><td>AND</td><td>A 与 B 按位与</td><td>0</td></tr>
+<tr><td>10</td><td>XOR</td><td>A 与 B 按位异或</td><td>0</td></tr>
+<tr><td>11</td><td>SHR</td><td>A 逻辑右移一位</td><td>0</td></tr>
+</tbody></table>
+
+<p>除了运算结果，ALU 还要输出两个“复制”信号 <i>dup_result</i>[2:0] 和 <i>dup_carry</i>。它们的值与 <i>result</i>、<i>carry</i> 相同，目的是把这些内部信号送到 JA 排针，方便逻辑分析仪观察；LED 仍然显示原来的结果和进位。</p>
+
+<h2>步骤</h2>
+<ol>
+<li><b>建立工程。</b>打开 Vivado，新建工程，器件选择 <font face="Menlo, monospace">xc7a35tcpg236-1</font>（Basys 3）。工程名可以用 <font face="Menlo, monospace">lab3_alu</font>。</li>
+<li><b>添加源文件。</b>新建 <font face="Menlo, monospace">alu.vhd</font>，把下面的模板抄进去，然后添加到工程。实体名与文件名保持一致。</li>
+<li><b>RTL 分析。</b>对源文件执行 RTL Analysis，打开原理图。观察 Vivado 根据你的代码推断出的门电路；它可能与图 1 不同，这是正常的。</li>
+<li><b>写 I/O 约束。</b>新建 XDC，按表 2 分配引脚。SW0–SW2 是 <i>A</i>，SW3–SW5 是 <i>B</i>，SW6–SW7 是 <i>op</i>；LD0–LD2 是 <i>result</i>，LD3 是 <i>carry</i>；JA1–JA3 是 <i>dup_result</i>[0]–[2]，JA4 是 <i>dup_carry</i>。</li>
+<li><b>仿真。</b>新建 <font face="Menlo, monospace">alu_tb.vhd</font>，用下面的测试平台模板产生激励；运行 XSim，观察波形。</li>
+<li><b>综合、实现、生成比特流并下载。</b>流程与实验 1、2 相同。下载后拨动开关，核对 LED。</li>
+</ol>
+<div class="tabcap">表 2. Basys 3 引脚分配。</div>
+<table class=""><thead><tr><th>信号</th><th>引脚</th><th>板上元件</th></tr></thead><tbody><tr><td>A[2:0]</td><td>V17, V16, W16</td><td>SW0, SW1, SW2</td></tr>
+<tr><td>B[2:0]</td><td>W17, W15, V15</td><td>SW3, SW4, SW5</td></tr>
+<tr><td>op[1:0]</td><td>W14, W13</td><td>SW6, SW7</td></tr>
+<tr><td>result[2:0]</td><td>U16, E19, U19</td><td>LD0, LD1, LD2</td></tr>
+<tr><td>carry</td><td>V19</td><td>LD3</td></tr>
+<tr><td>dup_result[2:0]</td><td>J1, L2, J2</td><td>JA1, JA2, JA3</td></tr>
+<tr><td>dup_carry</td><td>G2</td><td>JA4</td></tr>
+</tbody></table>
+
+<h2>ALU 模板</h2>
+<p>下面的模板给出实体、信号和输出连接。运算部分需要你自己补全。注意模板只引用了 <font face="Menlo, monospace">STD_LOGIC_1164</font>；如果要直接对 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 做加法，需要再引用 <font face="Menlo, monospace">IEEE.STD_LOGIC_UNSIGNED.ALL</font> 或 <font face="Menlo, monospace">IEEE.NUMERIC_STD.ALL</font>。</p>
+<pre class="code long">library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity ALU is
+    Port ( A          : in  STD_LOGIC_VECTOR (2 downto 0);
+           B          : in  STD_LOGIC_VECTOR (2 downto 0);
+           op         : in  STD_LOGIC_VECTOR (1 downto 0);
+           result     : out STD_LOGIC_VECTOR (2 downto 0);
+           carry      : out STD_LOGIC;
+           dup_result : out STD_LOGIC_VECTOR (2 downto 0);
+           dup_carry  : out STD_LOGIC);
+end ALU;
+
+architecture Behavioral of ALU is
+    signal result_t : STD_LOGIC_VECTOR (2 downto 0);
+    signal carry_t  : STD_LOGIC;
+begin
+    -- 在这里写运算逻辑：根据 op 选择 result_t 和 carry_t。
+    -- 例如：
+    --   tmp &lt;= ('0' &amp; A) + ('0' &amp; B);
+    --   with op select
+    --       result_t &lt;= tmp(2 downto 0) when "00",
+    --                   A and B        when "01",
+    --                   A xor B        when "10",
+    --                   to_stdlogicvector(to_bitvector(A) srl 1) when others;
+
+    result     &lt;= result_t;
+    carry      &lt;= carry_t;
+    dup_result &lt;= result_t;
+    dup_carry  &lt;= carry_t;
+end Behavioral;</pre>
+<div class="listing-cap">代码清单 1. ALU 的实体与结构体模板（运算部分待补全）。</div>
+
+<h2>提示</h2>
+<ul>
+<li><font face="Menlo, monospace">+</font>、<font face="Menlo, monospace">AND</font>、<font face="Menlo, monospace">OR</font>、<font face="Menlo, monospace">XOR</font> 可以直接用于 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>，但算术 <font face="Menlo, monospace">+</font> 需要相应的无符号包或 <font face="Menlo, monospace">NUMERIC_STD</font>。</li>
+<li><font face="Menlo, monospace">sll</font> 和 <font face="Menlo, monospace">srl</font> 是为 <font face="Menlo, monospace">BIT_VECTOR</font> 定义的。对 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 要先转换：<font face="Menlo, monospace">to_stdlogicvector(to_bitvector(A) srl 1)</font>。</li>
+<li>把操作数前面拼一个 <font face="Menlo, monospace">'0'</font> 再做四位加法：<font face="Menlo, monospace">tmp &lt;= ('0' &amp; A) + ('0' &amp; B);</font>。和的低三位是结果，<font face="Menlo, monospace">tmp(3)</font> 是进位。</li>
+<li><font face="Menlo, monospace">with ... select</font> 是并发选择赋值，适合实现运算选择。每个分支都要赋值，最后用 <font face="Menlo, monospace">when others</font> 覆盖剩余编码。</li>
+</ul>
+<figure><img src="figs/manual/rtl_schematic.png" alt=""><figcaption>图 1. Vivado 根据 ALU 代码推断出的 RTL 原理图（原手册第 5 页）。</figcaption></figure>
+
+<h2>测试平台</h2>
+<p>测试平台的实体端口列表为空，因为仿真不连接引脚。下面的模板给出元件声明、信号和进程框架；你需要用 <font face="Menlo, monospace">A</font>、<font face="Menlo, monospace">B</font>、<font face="Menlo, monospace">op</font> 的赋值和 <font face="Menlo, monospace">wait for</font> 产生激励。一次只改一组输入时，其他信号会保持上一次的值。</p>
+<pre class="code long">Library IEEE;
+Use IEEE.STD_LOGIC_1164.ALL;
+
+Entity ALU_tb is
+end ALU_tb;
+
+Architecture Behavioral of ALU_tb is
+    COMPONENT ALU is
+        Port ( A          : in  STD_LOGIC_VECTOR (2 DOWNTO 0);
+               B          : in  STD_LOGIC_VECTOR (2 DOWNTO 0);
+               op         : in  STD_LOGIC_VECTOR (1 DOWNTO 0);
+               result     : out STD_LOGIC_VECTOR (2 DOWNTO 0);
+               carry      : out STD_LOGIC;
+               dup_result : out STD_LOGIC_VECTOR (2 DOWNTO 0);
+               dup_carry  : out STD_LOGIC);
+    END COMPONENT;
+
+    SIGNAL A          : STD_LOGIC_VECTOR (2 DOWNTO 0);
+    SIGNAL B          : STD_LOGIC_VECTOR (2 DOWNTO 0);
+    SIGNAL op         : STD_LOGIC_VECTOR (1 DOWNTO 0);
+    SIGNAL result     : STD_LOGIC_VECTOR (2 DOWNTO 0);
+    SIGNAL carry      : STD_LOGIC;
+    SIGNAL dup_result : STD_LOGIC_VECTOR (2 DOWNTO 0);
+    SIGNAL dup_carry  : STD_LOGIC;
+begin
+    uut: ALU PORT MAP (A, B, op, result, carry, dup_result, dup_carry);
+
+    sigen: PROCESS
+    begin
+        -- 在这里给 A、B、op 赋值，并在每次变化后 wait for 10 ns。
+        wait;
+    end PROCESS sigen;
+end Behavioral;</pre>
+<div class="listing-cap">代码清单 2. 测试平台模板。</div>
+
+<p>一个最简单的单值测试可以先令 <i>A</i> = "011"、<i>B</i> = "110"、<i>op</i> = "00"，运行后检查 3 + 6 = 9，即 <i>result</i> = 001、<i>carry</i> = 1。确认单值正确后，再在进程里加四段激励，分别覆盖 ADD、AND、XOR 和 SHR。</p>
+<figure><img src="figs/manual/sim_screenshot.png" alt=""><figcaption>图 2. 单值仿真的波形窗口：A = 3、B = 6、op = 0，result = 1、carry = 1（原手册第 7 页）。</figcaption></figure>
+
+<p>把单值扩展成四段激励后，预期值如表 3。四段结果互不相同，波形一眼就能看出运算有没有接错。</p>
+<div class="tabcap">表 3. 四段激励的预期输出（A = 101，B = 011）。</div>
+<table class=""><thead><tr><th>时间段</th><th>op</th><th>运算</th><th>result</th><th>carry</th></tr></thead><tbody><tr><td>0–10 ns</td><td>00</td><td>ADD</td><td>000</td><td>1</td></tr>
+<tr><td>10–20 ns</td><td>01</td><td>AND</td><td>001</td><td>0</td></tr>
+<tr><td>20–30 ns</td><td>10</td><td>XOR</td><td>110</td><td>0</td></tr>
+<tr><td>30–40 ns</td><td>11</td><td>SHR</td><td>010</td><td>0</td></tr>
+</tbody></table>
+
+<div class="checkpoint"><b>检查点 1：</b>向演示者展示测试平台，以及显示 ADD、AND、XOR 和移位运算的波形窗口截图。</div>
+<div class="checkpoint"><b>检查点 2：</b>向演示者展示开发板和结果，确认设计工作正常。请记得截图并拍照，供实验报告使用。</div>
+<div class="checkpoint"><b>检查点 3：</b>在实验报告中讨论：如果要实现 7 种运算，VHDL 源代码需要怎样修改。</div>
+
+<h1>实验 2：使用逻辑分析仪观察信号</h1>
+<p>本实验用逻辑分析仪观察 ALU 的 <i>dup_result</i> 和 <i>dup_carry</i>。这样可以直接看到每一位随时间的变化，而不只是看 LED 的最终值。</p>
+<ol>
+<li>在板子上设置 <i>A</i> = 000、<i>B</i> = 000、<i>op</i> = 00。</li>
+<li>把彩虹线接到逻辑分析仪，注意黑线对准逻辑分析仪底部的 GND 引脚。</li>
+<li>把另一端接到 Basys 3 的 JA 排针：黑线接 GND，棕线接 JA1，红线接 JA2，橙线接 JA3，黄线接 JA4。黑线必须接 GND。</li>
+<li>用 USB Type-C 线把逻辑分析仪接到电脑。</li>
+<li>打开 PulseView。</li>
+<li>把触发设为 D0 上升沿，采样设为 5 M 采样点、1 MHz。</li>
+<li>参数设置好后点击 Run。</li>
+<li>逐位改变 <i>A</i>（000 → 111），再逐位改变 <i>B</i>（000 → 111）。</li>
+<li>当 JA1 从 0 变 1 时，逻辑分析仪开始记录波形。</li>
+</ol>
+<figure><img src="figs/manual/logic_analyzer.png" alt=""><figcaption>图 3. 把彩虹线接到逻辑分析仪（原手册第 9 页）。</figcaption></figure>
+<figure><img src="figs/manual/pmod_pinout.png" alt=""><figcaption>图 4. PMOD 引脚排列：5、11 脚为 GND，6、12 脚为 VCC，其余为信号（原手册第 9 页）。</figcaption></figure>
+<figure><img src="figs/manual/basys3_photo.png" alt=""><figcaption>图 5. Basys 3 与 JA 排针的连接（原手册第 9 页）。</figcaption></figure>
+<figure><img src="figs/manual/pulseview_settings.png" alt=""><figcaption>图 6. PulseView 的触发与采样设置（原手册第 10 页）。</figcaption></figure>
+<figure><img src="figs/manual/pulseview_waveform.png" alt=""><figcaption>图 7. 一次逻辑分析仪采集的波形（原手册第 10 页）。</figcaption></figure>
+
+<p>观察波形时，注意以下几件事：</p>
+<ul>
+<li>D0 对应 JA1，即 <i>dup_result</i>[0]，是结果的最低位；D1、D2 依次是第 1 位和最高位；D3 对应 JA4，即 <i>dup_carry</i>。</li>
+<li>当 <i>B</i> = 000、<i>op</i> = 00 时，结果等于 <i>A</i>，所以 D0 每变一次 <i>A</i> 就翻转一次，D1 每两次翻转一次，D2 每四次翻转一次。</li>
+<li>当 <i>A</i> = 111、<i>B</i> = 001 时，7 + 1 = 8，结果为 000、进位为 1，D3 会变高。</li>
+<li>采样窗口要足够长，才能覆盖整个手拨开关的过程。5 M @ 1 MHz 是 5 s；如果拨得慢，可以改用 1 M @ 20 kHz（50 s）。</li>
+</ul>
+<div class="checkpoint"><b>检查点 4：</b>向演示者展示逻辑分析仪的波形，并解释它是怎样产生的（触发、采样率、通道对应关系）。</div>
+
+<h1>报告要求</h1>
+<p>报告应包含：</p>
+<ol>
+<li>实验目的与 ALU 的运算表；</li>
+<li>VHDL 设计说明，包括类型转换、位切片、拼接和选择赋值；</li>
+<li>测试平台与仿真波形（检查点 1）；</li>
+<li>板级测试结果（检查点 2），建议用表格列出输入、结果、进位和 LED 模式；</li>
+<li>检查点 3：七种运算的修改方案，包括运算表、代码片段和对进位的讨论；</li>
+<li>检查点 4：逻辑分析仪波形与说明（触发、采样率、通道）；</li>
+<li>结论与遇到的问题。</li>
+</ol>
+<p class="small">本中文版根据英文原版手册翻译并重新排版，图中的原始截图来自英文原版；如与英文原版有冲突，以英文原版为准。</p>
+
+</body>
+</html>

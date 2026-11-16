@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>J8 实验报告三 — 简易 3 位 ALU</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="zh">
+
+<div class="title-page">
+  <div class="univ">香港QS No.2大学</div>
+  <div class="dept">J8学系</div>
+  <div class="rule"></div>
+  <div class="course">J8课程</div>
+  <div class="kind">实验报告三</div>
+  <div class="labno">简易 3 位 ALU</div>
+  <div class="labtitle">设计、仿真与逻辑分析仪验证</div>
+  <div class="meta">2026/27 学年 A 学期<br>课程主任：Prof. IcEteA<br><br>姓名：<b>IcEteA So Handsome</b><br>学号：<b>91786767</b><br>日期：<b>2026 年 11 月 16 日</b></div>
+</div>
+
+<h1>1. 实验目的</h1>
+<p>本次实验的目的，是不再把加法器当成一个大的布尔表达式，而是做一个由两位操作码选择运算的小型算术逻辑单元（ALU）。ALU 有两个三位操作数 <i>A</i> 和 <i>B</i>、一个操作码 <i>op</i>[1:0]，输出三位结果和一位进位。四种运算分别是加法、按位与、按位异或，以及把 <i>A</i> 逻辑右移一位。</p>
+<p>除了做出能工作的电路，这次实验还有四个目的。第一，复习前两次实验的组合逻辑流程：写 VHDL、仿真、约束引脚、综合、实现、下载。第二，有意识地使用 VHDL 的类型转换。手册提示 <font face="Menlo, monospace">srl</font> 只适用于 <font face="Menlo, monospace">BIT_VECTOR</font>，不适用于 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>，这是课程中第一次“不转换就编译不过”的地方。第三，练习位切片与拼接：四位和由 <font face="Menlo, monospace">('0' &amp; A) + ('0' &amp; B)</font> 得到，移位结果由 <font face="Menlo, monospace">'0' &amp; A(2 downto 1)</font> 得到。第四，通过 PMOD 接口用逻辑分析仪观察同样的信号，而不是只相信 LED。</p>
+<p>最终完成的是一个纯组合逻辑设计。测试平台给出四段激励，每段对应一种运算，波形上四段结果互不相同。板级实现把操作数接到 SW0–SW5，把操作码接到 SW6–SW7，把结果接到 LD0–LD2，把进位接到 LD3。复制输出 <font face="Menlo, monospace">dup_result</font> 和 <font face="Menlo, monospace">dup_carry</font> 接到 JA1–JA4，供逻辑分析仪使用。报告同时回答检查点 3：如果要实现七种运算，VHDL 需要怎样修改。</p>
+
+<h1>2. 设计</h1>
+<h2>2.1 运算表</h2>
+<p>在写任何 VHDL 之前，先用表 1 把行为固定下来。最关键的一列是“进位”：只有加法可能从第 2 位产生进位，因此与、异或和移位都把进位强制为 0。先固定这一列，可以避免“逻辑运算时进位没有赋值”这种常见错误。</p>
+<div class="tabcap">表 1. 3 位 ALU 的运算表。</div>
+<table class=""><thead><tr><th>op[1:0]</th><th>运算</th><th>result[2:0]</th><th>carry</th></tr></thead><tbody><tr><td>00</td><td>ADD</td><td>(A + B) mod 8</td><td>A + B ≥ 8 时为 1，否则为 0</td></tr>
+<tr><td>01</td><td>AND</td><td>A 与 B 按位与</td><td>0</td></tr>
+<tr><td>10</td><td>XOR</td><td>A 与 B 按位异或</td><td>0</td></tr>
+<tr><td>11</td><td>SHR</td><td>A 逻辑右移一位</td><td>0</td></tr>
+</tbody></table>
+
+<p>加法在四位上进行。在每个操作数前面拼接一个 <font face="Menlo, monospace">'0'</font>，就把操作数扩展成四位；和的第四位正好是第 2 位的进位：</p>
+<div class="eq">tmp &lt;= ('0' &amp; A) + ('0' &amp; B);&nbsp;&nbsp;&nbsp; result = tmp(2 downto 0),&nbsp; carry = tmp(3)</div>
+<p>用算术语言说，结果是 <i>(A + B)</i> 对 8 取模，进位在 <i>A + B</i> 不小于 8 时恰为 1。与和异或按位进行，进位没有意义，所以接 0。移位时结果最高位为 0，<i>A</i> 的低两位下移：<i>result</i> = <font face="Menlo, monospace">'0' &amp; A(2 downto 1)</font>。这是逻辑移位，不是算术移位，旧符号位不会复制。三位操作数下，<i>A</i> = 101 右移一位是 010，不是 110。</p>
+<p>手册里有一个容易看漏的细节：<font face="Menlo, monospace">sll</font> 和 <font face="Menlo, monospace">srl</font> 是为 <font face="Menlo, monospace">BIT_VECTOR</font> 定义的，不是为 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 定义的。如果 <i>A</i> 声明为 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>，直接写 <font face="Menlo, monospace">A srl 1</font> 在 VHDL-93 下编译不过。因此设计先转换成 <font face="Menlo, monospace">BIT_VECTOR</font>，移位，再转换回来：</p>
+<div class="eq">result &lt;= to_stdlogicvector(to_bitvector(A) srl 1);</div>
+<p>这个转换是显式的，而且把移位放在“运算符确实存在”的类型域里。另一个不太显眼的细节是选择语句的默认分支。手册的译码器例子在 <font face="Menlo, monospace">when others</font> 里写了 <font face="Menlo, monospace">"ZZZZ"</font>；那是共享总线用的三态值，不适合作为内部多路选择器的默认值。本设计改用具体的默认值，并把移位放在最后一个具名分支，这样 <font face="Menlo, monospace">when others</font> 覆盖移位以及仿真时刻可能出现的 <font face="Menlo, monospace">"UU"</font> 等值。</p>
+
+<h2>2.2 VHDL 描述</h2>
+<p>代码清单 1 是完整的实体和结构体。实体名是 <font face="Menlo, monospace">ALU</font>，与文件名 <font face="Menlo, monospace">alu.vhd</font> 一致，因为 Vivado 添加源文件时使用文件名，名字不一致会让顶层更难找。所有端口名都与手册和 XDC 完全一致。</p>
+<p>与模板相比，第一处改动是库子句。模板只用了 <font face="Menlo, monospace">IEEE.STD_LOGIC_1164.ALL</font>。这个包定义了类型和逻辑运算符，但没有在 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 上定义算术 <font face="Menlo, monospace">+</font>。加入 <font face="Menlo, monospace">IEEE.STD_LOGIC_UNSIGNED.ALL</font> 后，四位向量的 <font face="Menlo, monospace">+</font> 才是我想要的无符号加法。另一种写法是用 <font face="Menlo, monospace">NUMERIC_STD</font> 加 <font face="Menlo, monospace">unsigned(...)</font> 转换；用 unsigned 包可以让代码更接近手册的提示，也避免在加法器周围写四次转换。</p>
+<p>和在并发赋值中只算一次，随后两个选择信号赋值根据 <i>op</i> 选出结果和进位。<font face="Menlo, monospace">with op select</font> 是并发语句，等价于一个多路选择器加无寄存器输出；没有进程，没有敏感列表，也不会产生锁存器。每个分支都赋了值，最后一个分支是 <font face="Menlo, monospace">when others</font>，所以四种编码以及仿真时刻的元值都有定义。</p>
+<p>复制输出只是 <font face="Menlo, monospace">result_t</font> 和 <font face="Menlo, monospace">carry_t</font> 的并发副本。它们不是第二个 ALU，也不改变逻辑；它们存在是因为 LED 引脚和 PMOD 排针是不同引脚，逻辑分析仪需要在 JA 上看到副本。综合器会把两份都保留下来，因为两份都驱动输出引脚。</p>
+<pre class="code long">library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+entity ALU is
+    Port ( A          : in  STD_LOGIC_VECTOR (2 downto 0);
+           B          : in  STD_LOGIC_VECTOR (2 downto 0);
+           op         : in  STD_LOGIC_VECTOR (1 downto 0);
+           result     : out STD_LOGIC_VECTOR (2 downto 0);
+           carry      : out STD_LOGIC;
+           dup_result : out STD_LOGIC_VECTOR (2 downto 0);
+           dup_carry  : out STD_LOGIC);
+end ALU;
+architecture Behavioral of ALU is
+    signal result_t : STD_LOGIC_VECTOR (2 downto 0);
+    signal carry_t  : STD_LOGIC;
+    signal tmp      : STD_LOGIC_VECTOR (3 downto 0);
+begin
+    -- 4-bit sum: tmp(3) is the carry-out, tmp(2 downto 0) is the 3-bit result.
+    tmp &lt;= ('0' &amp; A) + ('0' &amp; B);
+    with op select
+        result_t &lt;= tmp(2 downto 0) when "00",
+                    A and B        when "01",
+                    A xor B        when "10",
+                    to_stdlogicvector(to_bitvector(A) srl 1) when others;
+    with op select
+        carry_t &lt;= tmp(3) when "00",
+                   '0'    when others;
+    result     &lt;= result_t;
+    carry      &lt;= carry_t;
+    dup_result &lt;= result_t;
+    dup_carry  &lt;= carry_t;
+end Behavioral;</pre>
+<div class="listing-cap">代码清单 1. alu.vhd：四种运算的 ALU（省略注释）。</div>
+
+<h2>2.3 测试平台</h2>
+<p>代码清单 2 是测试平台。实体端口列表为空，因为仿真没有引脚。元件声明重复 ALU 的端口，端口映射使用具名关联。我在实验二吃过按位置映射的亏：端口顺序一改，设计仍然能展开，但操作数被接反，波形看起来“合理”却是错的。</p>
+<p>四段激励都保持 <i>A</i> = 101、<i>B</i> = 011。这样选是为了让四个结果互不相同：5 + 3 = 8 得 000、进位 1；5 与 3 得 001；5 异或 3 得 110；5 &gt;&gt; 1 得 010。如果两种运算产生相同结果，操作码接错时波形可能看不出来。</p>
+<div class="tabcap">表 2. 测试平台的激励与预期输出。</div>
+<table class=""><thead><tr><th>时间 (ns)</th><th>op</th><th>运算</th><th>A</th><th>B</th><th>result</th><th>carry</th></tr></thead><tbody><tr><td>0–10</td><td>00</td><td>ADD</td><td>101</td><td>011</td><td>000</td><td>1</td></tr>
+<tr><td>10–20</td><td>01</td><td>AND</td><td>101</td><td>011</td><td>001</td><td>0</td></tr>
+<tr><td>20–30</td><td>10</td><td>XOR</td><td>101</td><td>011</td><td>110</td><td>0</td></tr>
+<tr><td>30–40</td><td>11</td><td>SHR</td><td>101</td><td>011</td><td>010</td><td>0</td></tr>
+</tbody></table>
+
+<p>每次赋值后都有 <font face="Menlo, monospace">wait for 10 ns</font>，最后的 <font face="Menlo, monospace">wait;</font> 让进程停住。如果没有最后的 wait，进程会立刻重复，波形上只剩最后一段，前三段只是一串 delta 周期的模糊。给 <i>A</i>、<i>B</i>、<i>op</i> 的初值让第一个 delta 周期就是确定的，因此第一次赋值之前波形也有定义。</p>
+<pre class="code long">begin
+    -- Named port mapping: the order of the ports in the entity does not matter.
+    uut: ALU PORT MAP (A          =&gt; A,
+                       B          =&gt; B,
+                       op         =&gt; op,
+                       result     =&gt; result,
+                       carry      =&gt; carry,
+                       dup_result =&gt; dup_result,
+                       dup_carry  =&gt; dup_carry);
+    siggen: PROCESS
+    begin
+        -- 5 + 3 = 8 : result 000, carry 1
+        op &lt;= "00";
+        wait for 10 ns;
+        -- 5 AND 3 = 1
+        op &lt;= "01";
+        wait for 10 ns;
+        -- 5 XOR 3 = 6
+        op &lt;= "10";
+        wait for 10 ns;
+        -- 5 &gt;&gt; 1 = 2
+        op &lt;= "11";
+        wait for 10 ns;
+        -- Stop the process; without this wait the process would run forever.
+        wait;
+    end PROCESS siggen;
+end Behavioral;</pre>
+<div class="listing-cap">代码清单 2. alu_tb.vhd：端口映射与激励（省略声明）。</div>
+
+<h2>2.4 引脚约束与复制输出</h2>
+<p>表 3 把端口映射到 Basys 3。操作数用 SW0–SW5，操作码用 SW6–SW7，结果用 LD0–LD2，进位用 LD3。四个 JA 引脚复制同样的值，供逻辑分析仪使用。引脚编号来自 Basys 3 主 XDC，不是凭记忆写的。</p>
+<div class="tabcap">表 3. Basys 3 引脚分配。</div>
+<table class=""><thead><tr><th>信号</th><th>引脚</th><th>板上元件</th></tr></thead><tbody><tr><td>A[2:0]</td><td>V17, V16, W16</td><td>SW0, SW1, SW2</td></tr>
+<tr><td>B[2:0]</td><td>W17, W15, V15</td><td>SW3, SW4, SW5</td></tr>
+<tr><td>op[1:0]</td><td>W14, W13</td><td>SW6, SW7</td></tr>
+<tr><td>result[2:0]</td><td>U16, E19, U19</td><td>LD0, LD1, LD2</td></tr>
+<tr><td>carry</td><td>V19</td><td>LD3</td></tr>
+<tr><td>dup_result[2:0]</td><td>J1, L2, J2</td><td>JA1, JA2, JA3</td></tr>
+<tr><td>dup_carry</td><td>G2</td><td>JA4</td></tr>
+</tbody></table>
+
+<p>XDC 里有两个细节。第一，<font face="Menlo, monospace">get_ports</font> 里的名字必须与 VHDL 完全一致，包括下标：写 <font face="Menlo, monospace">{A[0]}</font>，不是 <font face="Menlo, monospace">{A0}</font>。名字不一致不会阻止综合，但实现时会报告端口未布局，信号永远到不了引脚。第二，每个引脚都要有 <font face="Menlo, monospace">IOSTANDARD LVCMOS33</font>；缺少 IOSTANDARD 会在实现时触发 DRC 错误。CFGBVS 和 CONFIG_VOLTAGE 按主 XDC 的写法在整个设计里设置一次。</p>
+<p>复制输出是 <font face="Menlo, monospace">result_t</font> 和 <font face="Menlo, monospace">carry_t</font> 的副本，因此 LED 和逻辑分析仪看到的是同一个信号。没有副本时，分析仪只能去探 LED 引脚，而 LED 引脚并没有引到排针。四个 JA 引脚也是实体比运算表多出两个输出端口的原因。</p>
+<figure><img src="figs/fig_board.svg" alt=""><figcaption>图 1. 板级映射：开关、LED 与 ALU 使用的 JA 排针。</figcaption></figure>
+
+<h1>3. 结果与讨论</h1>
+<h2>3.1 综合后的电路</h2>
+<p>图 2 是预期 Vivado 会推断出的数据通路。加法器是四位进位链；与、异或和移位是各自独立的组合逻辑块；输出选择是由 <i>op</i> 控制的四选一多路选择器。手册第 5 页的 RTL 原理图显示了同样的块，Vivado 给它们起名 RTL_ADD、RTL_AND、RTL_XOR、RTL_RSHIFT 和 RTL_MUX。具体门数不重要，重要的是没有锁存器。选择语句的每个分支都赋值，因此设计是纯组合逻辑。</p>
+<figure><img src="figs/fig_datapath.svg" alt=""><figcaption>图 2. 四种运算 ALU 的数据通路：加法器、逻辑块、移位与输出选择。</figcaption></figure>
+
+<h2>3.2 检查点 1：仿真</h2>
+<p>图 3 是四段激励的波形。顶部的阶段标签依次标出 ADD、AND、XOR、SHR。光标在 35 ns，位于 SHR 段，此时 <i>result</i> = 010、<i>carry</i> = 0。表 4 重复了这些值，便于不读波形标签也能核对。</p>
+<div class="tabcap">表 4. 检查点 1 波形中的预期值。</div>
+<table class=""><thead><tr><th>阶段</th><th>op</th><th>A</th><th>B</th><th>result</th><th>carry</th><th>dup_result</th><th>dup_carry</th></tr></thead><tbody><tr><td>ADD</td><td>00</td><td>101</td><td>011</td><td>000</td><td>1</td><td>000</td><td>1</td></tr>
+<tr><td>AND</td><td>01</td><td>101</td><td>011</td><td>001</td><td>0</td><td>001</td><td>0</td></tr>
+<tr><td>XOR</td><td>10</td><td>101</td><td>011</td><td>110</td><td>0</td><td>110</td><td>0</td></tr>
+<tr><td>SHR</td><td>11</td><td>101</td><td>011</td><td>010</td><td>0</td><td>010</td><td>0</td></tr>
+</tbody></table>
+
+<p>有三处值得核对，而不只是看结果。第一，<i>carry</i> 只在第一段为 1；如果与或异或段出现 1，说明进位的选择赋值写错了。第二，<i>dup_result</i> 和 <i>dup_carry</i> 必须严格跟随 <i>result</i> 和 <i>carry</i>；不一致说明端口映射或副本接错。第三，10 ns 处的跳变是干净的：测试平台每次变化后等满 10 ns，采样点上不会残留 delta 周期的毛刺。</p>
+<p>同一组激励可以直接在 XSim 里运行。图 3 是按仿真值重画的矢量图，不是截图，这样打印出来数字仍然清楚；检查点达成指南里列出了需要截图的窗口。</p>
+<figure><img src="figs/fig_cp1.svg" alt=""><figcaption>图 3. 检查点 1 波形：四种运算各 10 ns，光标在 35 ns。</figcaption></figure>
+
+<h2>3.3 检查点 2：板级结果</h2>
+<p>表 5 列出板级测试的十组输入。前四组练习加法与进位，包括两行“结果为 000、进位为 1”的情况；接下来四组练习与和异或；最后两组练习移位。开关模式按 SW7 到 SW0 书写，可以当成一个字节来读；具体哪个物理开关对应哪一位，以板上印的标签为准。</p>
+<div class="tabcap">表 5. 板级测试用例与预期 LED 模式。</div>
+<table class=""><thead><tr><th>#</th><th>A</th><th>B</th><th>op</th><th>result</th><th>carry</th><th>LD3..LD0</th><th>SW7..SW0</th></tr></thead><tbody><tr><td>1</td><td>011</td><td>010</td><td>00</td><td>101</td><td>0</td><td>0101</td><td>00 010 011</td></tr>
+<tr><td>2</td><td>111</td><td>001</td><td>00</td><td>000</td><td>1</td><td>1000</td><td>00 001 111</td></tr>
+<tr><td>3</td><td>110</td><td>011</td><td>00</td><td>001</td><td>1</td><td>1001</td><td>00 011 110</td></tr>
+<tr><td>4</td><td>111</td><td>111</td><td>00</td><td>110</td><td>1</td><td>1110</td><td>00 111 111</td></tr>
+<tr><td>5</td><td>110</td><td>101</td><td>01</td><td>100</td><td>0</td><td>0100</td><td>01 101 110</td></tr>
+<tr><td>6</td><td>101</td><td>011</td><td>01</td><td>001</td><td>0</td><td>0001</td><td>01 011 101</td></tr>
+<tr><td>7</td><td>101</td><td>011</td><td>10</td><td>110</td><td>0</td><td>0110</td><td>10 011 101</td></tr>
+<tr><td>8</td><td>110</td><td>101</td><td>10</td><td>011</td><td>0</td><td>0011</td><td>10 101 110</td></tr>
+<tr><td>9</td><td>101</td><td>000</td><td>11</td><td>010</td><td>0</td><td>0010</td><td>11 000 101</td></tr>
+<tr><td>10</td><td>111</td><td>000</td><td>11</td><td>011</td><td>0</td><td>0011</td><td>11 000 111</td></tr>
+</tbody></table>
+
+<p>有两行特别容易误判。7 + 1 = 8 时 <i>result</i> = 000、<i>carry</i> = 1，LED 显示 1000 而不是 0000，因为 LD3 是进位。7 + 7 = 14 时结果是 110、进位 1，模式是 1110。若只看 LD2–LD0，这两行都像失败。移位行也要注意：5 &gt;&gt; 1 是 2（010），不是 6（110），因为这是逻辑移位，新的最高位是 0。</p>
+<p>开关顺序是另一个实际陷阱。板上 SW0 在拨码开关组的一端，SW7 在另一端；表中按 SW7 到 SW0 书写。设置时按板上印的标签，而不是从左往右数。表 5 的预期值与生成 <font face="Menlo, monospace">alu_expected.csv</font> 的参考模型来自同一份代码，因此表 1、表 5 和 CSV 不会互相矛盾，除非模型本身错了。</p>
+
+<h2>3.4 检查点 3：七种运算</h2>
+<p>手册要求讨论：如果要实现七种运算，VHDL 要怎样改。最干净的做法是把 <i>op</i> 扩展到三位：两位只能给出四种编码，再多的译码也变不出另外三种。表 6 列出七种运算和保留编码。</p>
+<div class="tabcap">表 6. 七种运算 ALU 的运算表。</div>
+<table class=""><thead><tr><th>op[2:0]</th><th>运算</th><th>result[2:0]</th><th>carry</th></tr></thead><tbody><tr><td>000</td><td>ADD</td><td>(A + B) mod 8</td><td>A + B ≥ 8 时为 1</td></tr>
+<tr><td>001</td><td>SUB</td><td>(A − B) mod 8</td><td>A ≥ B（无借位）时为 1</td></tr>
+<tr><td>010</td><td>AND</td><td>A 与 B</td><td>0</td></tr>
+<tr><td>011</td><td>OR</td><td>A 或 B</td><td>0</td></tr>
+<tr><td>100</td><td>XOR</td><td>A 异或 B</td><td>0</td></tr>
+<tr><td>101</td><td>SHR</td><td>A &gt;&gt; 1</td><td>0</td></tr>
+<tr><td>110</td><td>SHL</td><td>A &lt;&lt; 1（对 8 取模）</td><td>0</td></tr>
+<tr><td>111</td><td>保留</td><td>000</td><td>0</td></tr>
+</tbody></table>
+
+<p>数据通路有三处扩展。输出选择变成八选一多路选择器。加法器由 ADD 和 SUB 共用：减法在二进制补码里是 <i>A</i> + (not <i>B</i>) + 1，所以 <font face="Menlo, monospace">diff &lt;= ('0' &amp; A) + (not ('0' &amp; B)) + "0001"</font>。移位组增加 SHL，即 <font face="Menlo, monospace">A(1 downto 0) &amp; '0'</font>。与、或、异或复用原来的门。</p>
+<p>有三个细节容易错。第一，多出的 <i>op</i> 位需要引脚：Basys 3 上 SW8 是 V2，XDC 必须增加 <font face="Menlo, monospace">op[2]</font>。第二，保留编码 111 应输出确定值（000，进位 0），而不是 <font face="Menlo, monospace">'Z'</font>。第三，SUB 的进位不是 <font face="Menlo, monospace">diff(3)</font>，而是它的反，因为 <font face="Menlo, monospace">diff(3) = 1</font> 表示 <i>A</i> &lt; <i>B</i>，也就是有借位；<font face="Menlo, monospace">not diff(3)</font> 才是“无借位”标志。</p>
+<p>七运算测试平台每一段用不同的操作数，使七个结果互不相同：001、101、100、111、011、010、110。这样操作码接反时一眼就能看出来。完整设计在 <font face="Menlo, monospace">alu_7ops.vhd</font>，测试平台在 <font face="Menlo, monospace">alu_7ops_tb.vhd</font>；下面的清单只摘出运算选择和进位选择。</p>
+<pre class="code long">    signal sum  : STD_LOGIC_VECTOR (3 downto 0);
+    signal diff : STD_LOGIC_VECTOR (3 downto 0);
+begin
+    sum  &lt;= ('0' &amp; A) + ('0' &amp; B);
+    diff &lt;= ('0' &amp; A) + (not ('0' &amp; B)) + "0001";
+
+    with op select
+        result_t &lt;= sum(2 downto 0)              when "000",
+                    diff(2 downto 0)             when "001",
+                    A and B                      when "010",
+                    A or B                       when "011",
+                    A xor B                      when "100",
+                    to_stdlogicvector(to_bitvector(A) srl 1) when "101",
+                    A(1 downto 0) &amp; '0'          when "110",
+                    "000"                        when others;
+
+    with op select
+        carry_t &lt;= sum(3)     when "000",
+                   not diff(3) when "001",
+                   '0'         when others;</pre>
+<div class="listing-cap">代码清单 3. 七运算 ALU 中的运算选择与进位选择（摘录）。</div>
+<figure><img src="figs/fig_7ops.svg" alt=""><figcaption>图 4. 七运算数据通路：多一位操作码、八选一选择和共用的加减法单元。</figcaption></figure>
+
+<h2>3.5 检查点 4：逻辑分析仪</h2>
+<p>实验 2 在 PMOD 排针上观察同样的信号。接线是：黑线接 GND，棕线接 JA1，红线接 JA2，橙线接 JA3，黄线接 JA4。黑线必须接 GND，不能接 VCC；PMOD 引脚图把 5、11 脚标为 GND，把 6、12 脚标为 VCC。接错会得到一条直线，某些分析仪上还可能损坏输入。</p>
+<p>PulseView 设为 D0 上升沿触发、5 M 采样点、1 MHz 采样率。触发通道是 JA1 = <font face="Menlo, monospace">dup_result[0]</font>，也就是结果的 LSB。当 <i>B</i> = 000、op = 00 时，结果等于 <i>A</i>，所以 D0 就是 <i>A</i>(0)；每次 <i>A</i> 从偶数变奇数它都会上升，这个边沿启动采集。</p>
+<div class="tabcap">表 7. 逻辑分析仪通道。</div>
+<table class=""><thead><tr><th>分析仪通道</th><th>JA 引脚</th><th>ALU 信号</th><th>含义</th></tr></thead><tbody><tr><td>D0</td><td>JA1</td><td>dup_result[0]</td><td>结果 LSB</td></tr>
+<tr><td>D1</td><td>JA2</td><td>dup_result[1]</td><td>结果第 1 位</td></tr>
+<tr><td>D2</td><td>JA3</td><td>dup_result[2]</td><td>结果 MSB</td></tr>
+<tr><td>D3</td><td>JA4</td><td>dup_carry</td><td>进位</td></tr>
+</tbody></table>
+
+<p>图 5 是预期采集结果。前八步让 <i>A</i> 从 000 扫到 111，<i>B</i> = 000。D0 每步翻转，D1 每两步翻转，D2 每四步翻转，D3 保持 0。最后两步令 <i>B</i> = 001、<i>A</i> = 111；7 + 1 = 8 得 <i>result</i> = 000、<i>carry</i> = 1，所以 D3 变高，D0–D2 变低。这是整段采集中唯一出现进位的地方。</p>
+<figure><img src="figs/fig_cp4.svg" alt=""><figcaption>图 5. 预期逻辑分析仪采集：A 从 000 扫到 111、B = 000，然后 B = 001、A = 111。</figcaption></figure>
+
+<p>手册正文写“5 M 采样点、1 MHz”，第 10 页截图却显示 1 M 采样点、20 kHz。两者都有效：5 M @ 1 MHz 给出 5 s 窗口、1 μs 分辨率；1 M @ 20 kHz 给出 50 s 窗口、50 μs 分辨率。手拨开关时慢速设置更从容；如果拨得快，就用快速设置。指南里两种都给出，到实验台再选。</p>
+<p>矢量图有一个局限：它是理想采集。真实采集会在每个边沿出现短促的开关抖动，因为分析仪足够快，能记录到抖动。抖动不是 ALU 故障。如果波形像台阶，并在台阶处多出很窄的脉冲，那是开关，不是逻辑。</p>
+
+<h2>3.6 常见问题</h2>
+<p>这条流程里有几个错误很容易犯，每一个都指向不同的环节。记下修正方法比只贴最终代码更有用。</p>
+<ul>
+<li><b>按位置映射端口。</b>实体顺序一改，按位置映射的测试平台仍然能展开，但 <i>result</i> 可能接到 <i>carry</i>。具名关联能让波形可信。</li>
+<li><b>缺少最后的 wait。</b>进程末尾没有 <font face="Menlo, monospace">wait;</font> 时会重复执行，波形主要显示最后一段。最后的 wait 让进程在四段之后停住。</li>
+<li><b>移位用错类型。</b>对 <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> 写 <font face="Menlo, monospace">A srl 1</font> 编译不过；<font face="Menlo, monospace">to_bitvector</font> / <font face="Menlo, monospace">to_stdlogicvector</font> 成对转换即可。</li>
+<li><b>XDC 名字。</b>写 <font face="Menlo, monospace">A0</font>、<font face="Menlo, monospace">A1</font>、<font face="Menlo, monospace">A2</font> 而不是 <font face="Menlo, monospace">A[0]</font>、<font face="Menlo, monospace">A[1]</font>、<font face="Menlo, monospace">A[2]</font>，实现时端口会未布局。</li>
+<li><b>三态默认值。</b>照抄手册译码器例子的 <font face="Menlo, monospace">"ZZZZ"</font>，综合会警告三态；换成具体默认值即可消除警告和推断出的三态缓冲。</li>
+<li><b>分析仪地线。</b>采集是一条直线，通常是黑线接到了 VCC。改接 GND，并对照 PMOD 引脚图检查。</li>
+<li><b>触发边沿。</b>用下降沿触发会在扫描结束时才启动采集；上升沿才对应 JA1 的行为，从第一个偶数到奇数的跳变开始。</li>
+</ul>
+
+<h1>4. 结论</h1>
+<p>这个 ALU 满足四种运算的要求。设计是纯组合逻辑，加法的进位正确，逻辑运算把进位强制为 0，移位是逻辑移位。复制输出让 JA 上能看到内部值，而不改变逻辑。测试平台给出四个互不相同的结果，板级表覆盖了最容易误读的进位情况。</p>
+<p>这次实验最有用的部分不是算术，而是“先用表固定行为，再用测试平台核对表”的纪律。四位和用 <font face="Menlo, monospace">tmp(3)</font> 作进位只是一个小技巧，但它省掉了一条单独的进位等式，并使加法与进位必然一致。移位转换是课程中第一次遇到“信号类型决定可用运算符”的情况，显式转换比在注释里声称“这是逻辑移位”更清楚。</p>
+<p>检查点 3 说明，同样的结构可以通过更宽的选择器和共用的加减法单元扩展到七种运算；代价主要是多一个开关和更宽的 XDC。保留编码提醒我们：扩展操作码一定会产生必须定义的编码，而 <font face="Menlo, monospace">when others</font> 就是定义它们的地方。</p>
+<p>设计已经可以上板。剩下的工作是在实验台上核对表 5 的十组用例，并采集逻辑分析仪波形；报告中的图是矢量重画，便于保持数字清楚，指南列出了需要补拍的截图。完整源码、约束、工程脚本和预期值 CSV 与报告放在同一个仓库里。</p>
+
+</body>
+</html>

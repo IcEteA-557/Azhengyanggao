@@ -1,0 +1,235 @@
+@page {
+  size: A4;
+  margin: 16mm 16mm 18mm 16mm;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: "Times New Roman", "Songti SC", serif;
+  font-size: 11.5pt;
+  line-height: 1.38;
+  color: #111;
+  text-align: justify;
+  orphans: 2;
+  widows: 2;
+}
+
+/* ---------- title page ---------- */
+.title-page {
+  text-align: center;
+  page-break-after: always;
+  padding-top: 26mm;
+}
+.title-page .univ {
+  font-size: 17pt;
+  font-weight: bold;
+  letter-spacing: 0.4pt;
+  margin-bottom: 3mm;
+}
+.title-page .dept {
+  font-size: 13pt;
+  margin-bottom: 18mm;
+}
+.title-page .course {
+  font-size: 12pt;
+  margin-bottom: 4mm;
+}
+.title-page .kind {
+  font-size: 12pt;
+  letter-spacing: 1pt;
+  margin-bottom: 12mm;
+}
+.title-page .labno {
+  font-size: 24pt;
+  font-weight: bold;
+  margin-bottom: 6mm;
+}
+.title-page .labtitle {
+  font-size: 15pt;
+  font-style: italic;
+  margin-bottom: 22mm;
+}
+.title-page .meta {
+  font-size: 11.5pt;
+  line-height: 1.9;
+}
+.title-page .meta b { font-weight: bold; }
+
+/* ---------- headings ---------- */
+h1 {
+  font-size: 14.5pt;
+  font-weight: bold;
+  margin: 18pt 0 7pt;
+  text-align: left;
+  page-break-after: avoid;
+}
+h2 {
+  font-size: 12.5pt;
+  font-weight: bold;
+  margin: 13pt 0 5pt;
+  text-align: left;
+  page-break-after: avoid;
+}
+h3 {
+  font-size: 11.5pt;
+  font-weight: bold;
+  margin: 10pt 0 4pt;
+  text-align: left;
+  page-break-after: avoid;
+}
+
+p { margin: 0 0 7pt; }
+
+font[face] { font-size: 0.9em; }
+
+.title-page .rule {
+  width: 55%;
+  border-top: 0.8pt solid #333;
+  margin: 2mm auto 14mm;
+}
+
+/* ---------- equations ---------- */
+.eq {
+  text-align: center;
+  font-style: italic;
+  font-size: 12pt;
+  margin: 8pt 0;
+}
+.eq .op { font-style: normal; }
+
+/* ---------- figures ---------- */
+figure {
+  margin: 9pt 0;
+  text-align: center;
+  page-break-inside: avoid;
+}
+figure img {
+  max-width: 86%;
+  height: auto;
+}
+figcaption {
+  font-size: 10.5pt;
+  font-style: italic;
+  margin-top: 4pt;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ---------- tables ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.2pt;
+  margin: 5pt 0 4pt;
+  page-break-inside: avoid;
+}
+th, td {
+  border: 0.5pt solid #333;
+  padding: 3pt 5pt;
+  text-align: center;
+  vertical-align: middle;
+}
+th {
+  background: #ececec;
+  font-weight: bold;
+}
+.tabcap {
+  font-size: 10.5pt;
+  font-style: italic;
+  text-align: center;
+  margin: 10pt 0 3pt;
+  page-break-after: avoid;
+}
+table.left td, table.left th { text-align: left; }
+
+/* ---------- code ---------- */
+pre.code {
+  font-family: Menlo, monospace;
+  font-size: 7.8pt;
+  line-height: 1.22;
+  border: 0.6pt solid #444;
+  padding: 7pt 9pt;
+  white-space: pre-wrap;
+  text-align: left;
+  page-break-inside: avoid;
+  background: #fff;
+  margin: 6pt 0 3pt;
+}
+.listing-cap {
+  font-size: 10.5pt;
+  font-style: italic;
+  text-align: center;
+  margin: 3pt 0 10pt;
+}
+
+/* ---------- lists and helpers ---------- */
+ul, ol { margin: 0 0 7pt 18pt; padding: 0; }
+li { margin-bottom: 3pt; }
+.small { font-size: 10pt; }
+.center { text-align: center; }
+pre.code.long { font-size: 7.2pt; line-height: 1.16; }
+.keep { page-break-inside: avoid; }
+.pb { page-break-before: always; }
+.nobreak { page-break-inside: avoid; }
+
+/* ---------- Chinese documents ---------- */
+body.zh {
+  font-family: "Songti SC", "STSong", "Times New Roman", serif;
+  font-size: 11pt;
+  line-height: 1.7;
+  text-align: justify;
+}
+body.zh h1 { font-size: 14.5pt; margin: 16pt 0 7pt; }
+body.zh h2 { font-size: 12.5pt; margin: 12pt 0 5pt; }
+body.zh h3 { font-size: 11pt; margin: 9pt 0 4pt; }
+body.zh p { margin: 0 0 5pt; }
+
+/* manual */
+body.manual { font-size: 11pt; line-height: 1.85; }
+body.manual h1 { font-size: 16pt; margin: 14pt 0 8pt; }
+body.manual h2 { font-size: 13pt; margin: 12pt 0 5pt; }
+body.manual h3 { font-size: 11.5pt; margin: 9pt 0 4pt; }
+body.manual .checkpoint {
+  border: 1pt solid #333;
+  background: #f7f7f7;
+  padding: 7pt 10pt;
+  margin: 10pt 0;
+  page-break-inside: avoid;
+  text-align: left;
+}
+body.manual .checkpoint b { font-size: 11.5pt; }
+body.manual pre.code { font-size: 8.5pt; }
+body.manual figcaption { font-size: 9.5pt; }
+body.manual figure img { max-height: 70mm; width: auto; max-width: 100%; }
+body.manual table { font-size: 10pt; }
+
+/* guide */
+body.guide { font-size: 11pt; line-height: 1.72; }
+body.guide h1 { font-size: 15pt; margin: 14pt 0 7pt; }
+body.guide h2 { font-size: 12.5pt; margin: 11pt 0 5pt; }
+body.guide h3 { font-size: 11pt; margin: 8pt 0 4pt; }
+body.guide .checklist { list-style: none; margin-left: 0; padding-left: 0; }
+body.guide .checklist li { margin-bottom: 3pt; }
+body.guide .say {
+  border-left: 3pt solid #333;
+  background: #f4f4f4;
+  padding: 6pt 10pt;
+  margin: 8pt 0;
+  page-break-inside: avoid;
+  font-size: 10.5pt;
+}
+body.guide .warn {
+  border: 0.8pt solid #333;
+  padding: 6pt 10pt;
+  margin: 8pt 0;
+  background: #fbfbfb;
+  page-break-inside: avoid;
+  font-size: 10.5pt;
+}
+body.guide table { font-size: 9.6pt; page-break-inside: auto; }
+body.guide thead { display: table-header-group; }
+body.guide pre.code { font-size: 8.5pt; }
+body.guide figcaption { font-size: 9.5pt; }

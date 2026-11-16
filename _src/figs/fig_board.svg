@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 440" width="820" height="440" role="img" aria-label="Basys 3 pin map for the ALU">
+<title>Basys 3 pin map for the ALU</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#111111"/></marker><marker id="arrowm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/></marker></defs>
+<rect x="0" y="0" width="820" height="440" fill="#ffffff"/>
+<rect x="60" y="30" width="600" height="320" rx="10" fill="#f7f7f7" stroke="#111111" stroke-width="1.1"/>
+<text x="360" y="58" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="14" fill="#111111" font-weight="bold">Basys 3</text>
+<text x="360" y="76" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555" font-style="italic">xc7a35tcpg236-1</text>
+<rect x="110" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="123" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">V17</text>
+<text x="123" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW0</text>
+<rect x="154" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="167" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">V16</text>
+<text x="167" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW1</text>
+<rect x="198" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="211" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">W16</text>
+<text x="211" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW2</text>
+<rect x="242" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="255" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">W17</text>
+<text x="255" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW3</text>
+<rect x="286" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="299" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">W15</text>
+<text x="299" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW4</text>
+<rect x="330" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="343" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">V15</text>
+<text x="343" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW5</text>
+<rect x="374" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="387" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">W14</text>
+<text x="387" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW6</text>
+<rect x="418" y="240" width="26" height="50" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<text x="431" y="231" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="6.8" fill="#555555">W13</text>
+<text x="431" y="307" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">SW7</text>
+<circle cx="470" cy="112" r="9" fill="#ffffff" stroke="#111111" stroke-width="1.2"/>
+<text x="470" y="139" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">LD0</text>
+<circle cx="509" cy="112" r="9" fill="#ffffff" stroke="#111111" stroke-width="1.2"/>
+<text x="509" y="139" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">LD1</text>
+<circle cx="548" cy="112" r="9" fill="#ffffff" stroke="#111111" stroke-width="1.2"/>
+<text x="548" y="139" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">LD2</text>
+<circle cx="587" cy="112" r="9" fill="#ffffff" stroke="#111111" stroke-width="1.2"/>
+<text x="587" y="139" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.2" fill="#111111">LD3</text>
+<rect x="658" y="168" width="42" height="110" rx="2" fill="#ffffff" stroke="#111111" stroke-width="1.1"/>
+<circle cx="679" cy="178" r="3" fill="#111111"/>
+<text x="706" y="181" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA1</text>
+<circle cx="679" cy="195" r="3" fill="#111111"/>
+<text x="706" y="198" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA2</text>
+<circle cx="679" cy="212" r="3" fill="#111111"/>
+<text x="706" y="215" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA3</text>
+<circle cx="679" cy="229" r="3" fill="#111111"/>
+<text x="706" y="232" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA4</text>
+<circle cx="679" cy="246" r="3" fill="#111111"/>
+<text x="706" y="249" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA5</text>
+<circle cx="679" cy="263" r="3" fill="#111111"/>
+<text x="706" y="266" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8" fill="#111111">JA6</text>
+<text x="679" y="294" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#111111" font-weight="bold">JA</text>
+<rect x="150" y="348" width="9" height="9" rx="2" fill="#1a4f8a" stroke="#1a4f8a" stroke-width="1.1"/>
+<text x="166" y="356" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#1a4f8a" font-weight="bold">A[2:0] = SW2..SW0</text>
+<rect x="150" y="370" width="9" height="9" rx="2" fill="#2e6b2e" stroke="#2e6b2e" stroke-width="1.1"/>
+<text x="166" y="378" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#2e6b2e" font-weight="bold">B[2:0] = SW5..SW3</text>
+<rect x="150" y="392" width="9" height="9" rx="2" fill="#a05a00" stroke="#a05a00" stroke-width="1.1"/>
+<text x="166" y="400" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#a05a00" font-weight="bold">op[1:0] = SW7..SW6</text>
+<text x="466" y="88" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8.8" fill="#8a1a1a" font-weight="bold">result[2:0] = LD2..LD0</text>
+<text x="616" y="116" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8.8" fill="#5a2a7a" font-weight="bold">carry = LD3</text>
+<text x="360" y="428" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#555555" font-style="italic">All pins are 3.3 V; JA1–JA4 are J1, L2, J2, G2.</text>
+</svg>

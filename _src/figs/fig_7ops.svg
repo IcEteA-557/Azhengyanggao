@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 540" width="840" height="540" role="img" aria-label="Seven-operation ALU">
+<title>Seven-operation ALU</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#111111"/></marker><marker id="arrowm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/></marker></defs>
+<rect x="0" y="0" width="840" height="540" fill="#ffffff"/>
+<text x="22" y="62" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">A[2:0]</text>
+<text x="22" y="92" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">B[2:0]</text>
+<line x1="70" y1="56" x2="96" y2="72" stroke="#111111" stroke-width="1.1"/>
+<line x1="70" y1="86" x2="96" y2="102" stroke="#111111" stroke-width="1.1"/>
+<line x1="92" y1="50" x2="92" y2="452" stroke="#111111" stroke-width="1.1"/>
+<line x1="140" y1="64" x2="140" y2="452" stroke="#111111" stroke-width="1.1"/>
+<rect x="190" y="40" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="59" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">ADD</text>
+<text x="265" y="74" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">sum = A + B</text>
+<circle cx="92" cy="54" r="2.6" fill="#111111"/>
+<line x1="92" y1="54" x2="190" y2="54" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<circle cx="140" cy="68" r="2.6" fill="#111111"/>
+<line x1="140" y1="68" x2="190" y2="68" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="54" x2="516" y2="54" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="95" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="114" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">SUB</text>
+<text x="265" y="129" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">diff = A - B</text>
+<circle cx="92" cy="109" r="2.6" fill="#111111"/>
+<line x1="92" y1="109" x2="190" y2="109" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<circle cx="140" cy="123" r="2.6" fill="#111111"/>
+<line x1="140" y1="123" x2="190" y2="123" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="109" x2="516" y2="109" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="150" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="169" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">AND</text>
+<text x="265" y="184" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">A and B</text>
+<circle cx="92" cy="164" r="2.6" fill="#111111"/>
+<line x1="92" y1="164" x2="190" y2="164" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<circle cx="140" cy="178" r="2.6" fill="#111111"/>
+<line x1="140" y1="178" x2="190" y2="178" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="164" x2="516" y2="164" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="205" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="224" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">OR</text>
+<text x="265" y="239" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">A or B</text>
+<circle cx="92" cy="219" r="2.6" fill="#111111"/>
+<line x1="92" y1="219" x2="190" y2="219" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<circle cx="140" cy="233" r="2.6" fill="#111111"/>
+<line x1="140" y1="233" x2="190" y2="233" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="219" x2="516" y2="219" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="260" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="279" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">XOR</text>
+<text x="265" y="294" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">A xor B</text>
+<circle cx="92" cy="274" r="2.6" fill="#111111"/>
+<line x1="92" y1="274" x2="190" y2="274" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<circle cx="140" cy="288" r="2.6" fill="#111111"/>
+<line x1="140" y1="288" x2="190" y2="288" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="274" x2="516" y2="274" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="315" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="334" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">SHR</text>
+<text x="265" y="349" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">A srl 1</text>
+<circle cx="92" cy="329" r="2.6" fill="#111111"/>
+<line x1="92" y1="329" x2="190" y2="329" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="329" x2="516" y2="329" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="190" y="370" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="389" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111" font-weight="bold">SHL</text>
+<text x="265" y="404" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">A sll 1</text>
+<circle cx="92" cy="384" r="2.6" fill="#111111"/>
+<line x1="92" y1="384" x2="190" y2="384" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="340" y1="384" x2="516" y2="384" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="516" y="30" width="88" height="392" rx="2" fill="#fdfdfd" stroke="#111111" stroke-width="1.1"/>
+<text x="560" y="22" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="10.5" fill="#111111" font-weight="bold">8:1 MUX</text>
+<line x1="620" y1="422" x2="564" y2="422" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="624" y="426" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">op[2:0]</text>
+<rect x="190" y="455" width="150" height="42" rx="2" fill="#f2f2f2" stroke="#111111" stroke-width="1.1"/>
+<text x="265" y="474" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="10.5" fill="#111111" font-weight="bold">carry logic</text>
+<text x="265" y="490" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555" font-style="italic">sum(3) or not diff(3)</text>
+<line x1="340" y1="476" x2="516" y2="476" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<rect x="516" y="455" width="88" height="42" rx="2" fill="#fdfdfd" stroke="#111111" stroke-width="1.1"/>
+<text x="560" y="481" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#111111" font-weight="bold">carry MUX</text>
+<line x1="604" y1="110" x2="660" y2="110" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="670" y="114" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">result[2:0]</text>
+<line x1="604" y1="150" x2="660" y2="150" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="670" y="154" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">dup_result[2:0]</text>
+<circle cx="630" cy="110" r="2.6" fill="#111111"/>
+<line x1="630" y1="110" x2="630" y2="150" stroke="#111111" stroke-width="1.1"/>
+<line x1="630" y1="150" x2="660" y2="150" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="604" y1="476" x2="660" y2="476" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="670" y="480" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">carry</text>
+<line x1="604" y1="510" x2="660" y2="510" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="670" y="514" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="11" fill="#111111">dup_carry</text>
+<circle cx="630" cy="476" r="2.6" fill="#111111"/>
+<line x1="630" y1="476" x2="630" y2="510" stroke="#111111" stroke-width="1.1"/>
+<line x1="630" y1="510" x2="660" y2="510" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<line x1="620" y1="497" x2="564" y2="497" stroke="#111111" stroke-width="1.1" marker-end="url(#arrow)"/>
+<text x="624" y="501" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">op[2:0]</text>
+<text x="330" y="536" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#555555" font-style="italic">op = 111 is reserved and drives result = 000, carry = 0</text>
+</svg>

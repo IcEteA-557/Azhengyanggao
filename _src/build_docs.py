@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""Build the four Lab 3 documents as HTML, ready for Edge's print-to-PDF."""
+
+from __future__ import annotations
+
+import html
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+LAB3 = HERE.parent
+
+
+def esc(text: str) -> str:
+    return html.escape(text, quote=False)
+
+
+def listing(path: Path, caption: str, cls: str = "") -> str:
+    code = esc(path.read_text(encoding="utf-8").rstrip("\n"))
+    return (
+        f'<pre class="code {cls}">{code}</pre>\n'
+        f'<div class="listing-cap">{caption}</div>\n'
+    )
+
+
+def excerpt(path: Path, start: str | None = None) -> str:
+    """Return source text without the leading comment block, blank lines collapsed."""
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if start is not None:
+        for i, line in enumerate(lines):
+            if line.startswith(start):
+                lines = lines[i:]
+                break
+    out: list[str] = []
+    for line in lines:
+        if not line.strip():
+            continue
+        if line.lstrip().startswith("--") and not out:
+            continue
+        out.append(line.rstrip())
+    while out and not out[-1]:
+        out.pop()
+    return "\n".join(out)
+
+
+def listing_text(code: str, caption: str, cls: str = "") -> str:
+    return (
+        f'<pre class="code {cls}">{esc(code)}</pre>\n'
+        f'<div class="listing-cap">{caption}</div>\n'
+    )
+
+
+def figure(src: str, caption: str) -> str:
+    return (
+        f'<figure><img src="{src}" alt="">'
+        f"<figcaption>{caption}</figcaption></figure>\n"
+    )
+
+
+def table(caption: str, headers: list[str], rows: list[list[str]], cls: str = "") -> str:
+    head = "".join(f"<th>{cell}</th>" for cell in headers)
+    body = "".join(
+        "<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>\n" for row in rows
+    )
+    return (
+        f'<div class="tabcap">{caption}</div>\n'
+        f'<table class="{cls}"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>\n'
+    )
+
+
+def page(title: str, body: str, lang: str = "en", body_class: str = "") -> str:
+    return f"""<!doctype html>
+<html lang="{lang}">
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="{body_class}">
+{body}
+</body>
+</html>
+"""
+
+
+# ---------------------------------------------------------------------------
+def title_page_en() -> str:
+    return """
+<div class="title-page">
+  <div class="univ">Hong Kong QS No.2 University</div>
+  <div class="dept">J8 Department</div>
+  <div class="rule"></div>
+  <div class="course">J8 Course</div>
+  <div class="kind">Laboratory Report 3</div>
+  <div class="labno">A Simple 3-bit ALU</div>
+  <div class="labtitle">Design, simulation and logic-analyser verification</div>
+  <div class="meta">
+    2026/27 Semester A<br>
+    Course Leader: Prof. IcEteA<br><br>
+    Name: <b>IcEteA So Handsome</b><br>
+    Student No.: <b>91786767</b><br>
+    Date: <b>16 November 2026</b>
+  </div>
+</div>
+"""
+
+
+def report_en() -> str:
+    body = title_page_en()
+    body += """
+<h1>1. Objectives</h1>
+<p>The aim of Laboratory 3 was to stop treating arithmetic as one large Boolean expression and to build a small arithmetic-logic unit (ALU) in which a two-bit code chooses the operation. The ALU takes two three-bit operands, <i>A</i> and <i>B</i>, and an operation code <i>op</i>[1:0], and produces a three-bit result and a carry. The four operations are addition, bitwise AND, bitwise XOR and a logical right shift of <i>A</i> by one bit.</p>
+<p>The exercise had four purposes beyond producing a working circuit. The first was to revise the combinational-logic flow from Labs 1 and 2: write VHDL, simulate, constrain the pins, synthesise, implement and program the board. The second was to use VHDL type conversions deliberately. The manual's hint that <font face="Menlo, monospace">srl</font> works on <font face="Menlo, monospace">BIT_VECTOR</font>, not on <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>, is the first place in the course where a conversion is not optional. The third was to use slicing and concatenation: the four-bit sum is formed from <font face="Menlo, monospace">('0' &amp; A) + ('0' &amp; B)</font>, and the shift result is <font face="Menlo, monospace">'0' &amp; A(2 downto 1)</font>. The fourth was to observe the same signals on a logic analyser through the PMOD header, so that the internal values are visible without trusting the LEDs alone.</p>
+<p>I finished a purely combinational design. The testbench applies four stimuli, one per operation, and the waveform shows four distinct results. The board implementation maps the operands to SW0&ndash;SW5, the operation code to SW6&ndash;SW7, the result to LD0&ndash;LD2 and the carry to LD3. The duplicate outputs <font face="Menlo, monospace">dup_result</font> and <font face="Menlo, monospace">dup_carry</font> drive JA1&ndash;JA4 for the logic analyser. The report also answers Checkpoint 3 by describing the changes needed for an ALU with seven operations.</p>
+
+<h1>2. Design</h1>
+<h2>2.1 The operation table</h2>
+<p>Table 1 fixes the behaviour before any VHDL is written. The important column is <i>carry</i>: only addition can produce a carry out of bit 2, so AND, XOR and shift force it to 0. Fixing that column first avoids the common mistake of leaving the carry output undefined for the logic operations.</p>
+"""
+    body += table(
+        "Table 1. Operation table of the 3-bit ALU.",
+        ["op[1:0]", "Operation", "result[2:0]", "carry"],
+        [
+            ["00", "ADD", "(A + B) mod 8", "1 if A + B ≥ 8, else 0"],
+            ["01", "AND", "A and B (bitwise)", "0"],
+            ["10", "XOR", "A xor B (bitwise)", "0"],
+            ["11", "SHR", "A &gt;&gt; 1 (logical)", "0"],
+        ],
+    )
+    body += """
+<p>The addition is performed on four bits. Concatenating a <font face="Menlo, monospace">'0'</font> in front of each operand widens it to four bits, so the sum has a fourth bit that is exactly the carry out of bit 2:</p>
+<div class="eq">tmp &lt;= ('0' &amp; A) + ('0' &amp; B);&nbsp;&nbsp;&nbsp; result = tmp(2 downto 0),&nbsp; carry = tmp(3)</div>
+<p>In arithmetic terms the result is <i>(A + B)</i> modulo 8 and the carry is 1 exactly when <i>A + B</i> is at least 8. For AND and XOR the operation is applied bit by bit, and the carry has no meaning, so it is tied to 0. For the shift, the most significant bit of the result is 0 and the two lower bits of <i>A</i> move down: <i>result</i> = <font face="Menlo, monospace">'0' &amp; A(2 downto 1)</font>. This is a logical shift, not an arithmetic shift; the old sign bit is not copied. With three-bit operands, <i>A</i> = 101 shifted right by one is 010, not 110.</p>
+<p>One detail in the manual is easy to misread. The operators <font face="Menlo, monospace">sll</font> and <font face="Menlo, monospace">srl</font> are defined for <font face="Menlo, monospace">BIT_VECTOR</font>, not for <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>. Writing <font face="Menlo, monospace">A srl 1</font> with <i>A</i> declared as <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> does not compile in VHDL-93. The design therefore converts to <font face="Menlo, monospace">BIT_VECTOR</font>, shifts, and converts back:</p>
+<div class="eq">result &lt;= to_stdlogicvector(to_bitvector(A) srl 1);</div>
+<p>The conversion is explicit, and it keeps the shift in the type domain where the operator exists. A second, quieter detail is the default choice of the selected assignment. The manual's decoder example uses <font face="Menlo, monospace">"ZZZZ"</font> for <font face="Menlo, monospace">when others</font>; that is a tristate value for a shared bus, not a sensible default for an internal multiplexer. The ALU uses a concrete default instead, and the shift is the last named choice, so <font face="Menlo, monospace">when others</font> covers the shift and any simulation values such as <font face="Menlo, monospace">"UU"</font>.</p>
+
+<h2>2.2 The VHDL description</h2>
+<p>Listing 1 is the complete entity and architecture. The entity name is <font face="Menlo, monospace">ALU</font>, the same as the file name <font face="Menlo, monospace">alu.vhd</font>, because Vivado uses the file name when the source is added and a mismatch makes the top level harder to find. All ports are exactly the names used in the manual and in the XDC.</p>
+<p>The first line that differs from the template is the library clause. The template only used <font face="Menlo, monospace">IEEE.STD_LOGIC_1164.ALL</font>. That package defines the types and the logical operators, but it does not define arithmetic <font face="Menlo, monospace">+</font> on <font face="Menlo, monospace">STD_LOGIC_VECTOR</font>. I added <font face="Menlo, monospace">IEEE.STD_LOGIC_UNSIGNED.ALL</font> so that <font face="Menlo, monospace">+</font> on the four-bit vectors is the unsigned addition I want. The alternative would have been <font face="Menlo, monospace">NUMERIC_STD</font> with <font face="Menlo, monospace">unsigned(...)</font> conversions; the unsigned package keeps the listing close to the manual's hint and avoids four conversions around the adder.</p>
+<p>The sum is computed once in the concurrent assignment to <font face="Menlo, monospace">tmp</font>. The two selected signal assignments then choose the result and the carry from <i>op</i>. <font face="Menlo, monospace">with op select</font> is a concurrent statement, so it is equivalent to a multiplexer followed by a register-free output; there is no process, no sensitivity list and no chance of a latch. Every branch assigns a value, and the last branch is <font face="Menlo, monospace">when others</font>, so the outputs are defined for all four codes and for the meta-values that appear at time zero in simulation.</p>
+"""
+    body += listing_text(excerpt(LAB3 / "src" / "alu.vhd", "library"),
+                     "Listing 1. alu.vhd: the four-operation ALU (comments omitted).", "long")
+    body += """
+<p>The duplicate outputs are simple concurrent copies of <font face="Menlo, monospace">result_t</font> and <font face="Menlo, monospace">carry_t</font>. They are not a second ALU and they do not change the logic; they exist because the LED pins and the PMOD header are different pins, and the analyser needs a copy on JA. The synthesiser keeps both copies because both drive output pins.</p>
+
+<h2>2.3 The testbench</h2>
+<p>Listing 2 is the testbench. The entity has an empty port list because simulation has no pins. The component declaration repeats the ALU ports, and the port map uses named association. I used named association after the Lab 2 mistake of relying on positional order: when the ports were reordered, the design still elaborated but the operands were swapped, and the waveform looked plausible for the wrong reason.</p>
+<p>The stimulus keeps <i>A</i> = 101 and <i>B</i> = 011 for all four segments. Those values were chosen so that the four results are different: 5 + 3 = 8 gives 000 with carry 1; 5 AND 3 = 1 gives 001; 5 XOR 3 = 6 gives 110; and 5 &gt;&gt; 1 = 2 gives 010. If two operations produced the same result, a swapped <i>op</i> connection could hide in the waveform.</p>
+"""
+    body += table(
+        "Table 2. Stimulus and expected outputs of the testbench.",
+        ["Time (ns)", "op", "Operation", "A", "B", "result", "carry"],
+        [
+            ["0&ndash;10", "00", "ADD", "101", "011", "000", "1"],
+            ["10&ndash;20", "01", "AND", "101", "011", "001", "0"],
+            ["20&ndash;30", "10", "XOR", "101", "011", "110", "0"],
+            ["30&ndash;40", "11", "SHR", "101", "011", "010", "0"],
+        ],
+    )
+    body += """
+<p>Each assignment is followed by <font face="Menlo, monospace">wait for 10 ns</font>, and the final <font face="Menlo, monospace">wait;</font> stops the process. Without the final wait the process would immediately repeat; the last segment would be the only one visible, and the first three would be a blur of delta cycles. The initial values on <i>A</i>, <i>B</i> and <i>op</i> make the first delta cycle deterministic, so the waveform has a defined value before the first assignment.</p>
+"""
+    body += listing_text(excerpt(LAB3 / "src" / "alu_tb.vhd", "begin"),
+                     "Listing 2. alu_tb.vhd: port map and stimulus (declarations omitted).", "long")
+
+    body += """
+<h2>2.4 Pin constraints and the duplicate outputs</h2>
+<p>Table 3 maps the ports to the Basys 3. The operands use SW0&ndash;SW5, the operation code uses SW6&ndash;SW7, the result uses LD0&ndash;LD2 and the carry uses LD3. The four JA pins repeat the same values for the logic analyser. The pin numbers are taken from the Basys 3 master XDC, not typed from memory.</p>
+"""
+    body += table(
+        "Table 3. Pin assignment for the Basys 3.",
+        ["Signal", "Pins", "Board element"],
+        [
+            ["A[2:0]", "V17, V16, W16", "SW0, SW1, SW2"],
+            ["B[2:0]", "W17, W15, V15", "SW3, SW4, SW5"],
+            ["op[1:0]", "W14, W13", "SW6, SW7"],
+            ["result[2:0]", "U16, E19, U19", "LD0, LD1, LD2"],
+            ["carry", "V19", "LD3"],
+            ["dup_result[2:0]", "J1, L2, J2", "JA1, JA2, JA3"],
+            ["dup_carry", "G2", "JA4"],
+        ],
+    )
+    body += """
+<p>Two details in the XDC matter. First, the names in <font face="Menlo, monospace">get_ports</font> must match the VHDL names exactly, including the indices: <font face="Menlo, monospace">{A[0]}</font>, not <font face="Menlo, monospace">{A0}</font>. A mismatch does not stop synthesis, but implementation reports unplaced ports and the bit never reaches the pin. Second, every pin needs <font face="Menlo, monospace">IOSTANDARD LVCMOS33</font>; a missing IOSTANDARD is a DRC error at implementation. The CFGBVS and CONFIG_VOLTAGE properties are set once for the design, as in the master XDC.</p>
+<p>The duplicate outputs are copies of <font face="Menlo, monospace">result_t</font> and <font face="Menlo, monospace">carry_t</font>, so the LED and the analyser see the same signal. Without the copies the analyser would have to probe an LED pin, which is not brought out to a header. The four JA pins are also the reason the entity has two extra output ports that the operation table does not mention.</p>
+"""
+    body += figure("figs/fig_board.svg", "Figure 1. Board map: switches, LEDs and the JA header used by the ALU.")
+
+    body += """
+<h1>3. Results and Discussion</h1>
+<h2>3.1 The elaborated schematic</h2>
+<p>Figure 2 is the datapath I expect Vivado to infer. The adder is a four-bit carry chain; the AND, XOR and shift are separate combinational blocks; the output select is a four-to-one multiplexer driven by <i>op</i>. The manual's RTL schematic on page 5 of the lab sheet shows the same blocks with Vivado's names RTL_ADD, RTL_AND, RTL_XOR, RTL_RSHIFT and RTL_MUX. The exact gate count is not important; what matters is that no latch appears. Every output is assigned in every branch of the selected assignment, so the design is purely combinational.</p>
+"""
+    body += figure("figs/fig_datapath.svg", "Figure 2. Datapath of the four-operation ALU: adder, logic blocks, shift and output select.")
+
+    body += """
+<h2>3.2 Checkpoint 1: simulation</h2>
+<p>Figure 3 is the waveform for the four segments. The phase labels along the top mark ADD, AND, XOR and SHR. The cursor is at 35 ns, inside the SHR segment, where <i>result</i> = 010 and <i>carry</i> = 0. Table 4 repeats the values so that the figure can be checked without reading the waveform labels.</p>
+"""
+    body += table(
+        "Table 4. Expected values in the Checkpoint 1 waveform.",
+        ["Segment", "op", "A", "B", "result", "carry", "dup_result", "dup_carry"],
+        [
+            ["ADD", "00", "101", "011", "000", "1", "000", "1"],
+            ["AND", "01", "101", "011", "001", "0", "001", "0"],
+            ["XOR", "10", "101", "011", "110", "0", "110", "0"],
+            ["SHR", "11", "101", "011", "010", "0", "010", "0"],
+        ],
+    )
+    body += """
+<p>Three things are worth checking rather than only the result. First, <i>carry</i> is 1 only in the first segment; if it were 1 in AND or XOR, the carry selected assignment would be wrong. Second, <i>dup_result</i> and <i>dup_carry</i> follow <i>result</i> and <i>carry</i> exactly; a mismatch would mean a port-map or copy error. Third, the transition at 10 ns is clean: no delta-cycle glitch remains at the sample point because the testbench waits a full 10 ns between changes.</p>
+<p>The same stimulus is ready for XSim. The vector figure is drawn from the simulation values rather than a screenshot so that the numbers stay readable in print; the guide lists the screenshot to capture for the demonstrator.</p>
+"""
+    body += figure("figs/fig_cp1.svg", "Figure 3. Checkpoint 1 waveform: four operations, 10 ns each, cursor at 35 ns.")
+
+    body += """
+<h2>3.3 Checkpoint 2: board results</h2>
+<p>Table 5 lists ten cases for the board. The first four exercise addition and the carry, including the two rows where the result is 000 but the carry is 1. The next four exercise AND and XOR. The last two exercise the shift. The switch pattern is written from SW7 down to SW0, so it can be read as one byte; the labels on the board are the authority for which physical switch is which.</p>
+"""
+    body += table(
+        "Table 5. Board cases and the expected LED pattern.",
+        ["#", "A", "B", "op", "result", "carry", "LD3..LD0", "SW7..SW0"],
+        [
+            ["1", "011", "010", "00", "101", "0", "0101", "00 010 011"],
+            ["2", "111", "001", "00", "000", "1", "1000", "00 001 111"],
+            ["3", "110", "011", "00", "001", "1", "1001", "00 011 110"],
+            ["4", "111", "111", "00", "110", "1", "1110", "00 111 111"],
+            ["5", "110", "101", "01", "100", "0", "0100", "01 101 110"],
+            ["6", "101", "011", "01", "001", "0", "0001", "01 011 101"],
+            ["7", "101", "011", "10", "110", "0", "0110", "10 011 101"],
+            ["8", "110", "101", "10", "011", "0", "0011", "10 101 110"],
+            ["9", "101", "000", "11", "010", "0", "0010", "11 000 101"],
+            ["10", "111", "000", "11", "011", "0", "0011", "11 000 111"],
+        ],
+    )
+    body += """
+<p>Two rows are easy to misjudge. 7 + 1 = 8 gives <i>result</i> = 000 and <i>carry</i> = 1; the LEDs show 1000, not 0000, because LD3 is the carry. 7 + 7 = 14 gives 110 with carry 1; the pattern is 1110. If LD3 is ignored, both rows look like failures. The shift rows are also worth checking: 5 &gt;&gt; 1 is 2 (010), not 6 (110), because the shift is logical and the new MSB is 0.</p>
+<p>The switch order is the other practical trap. On the board SW0 is at one end of the bank and SW7 at the other; the table writes the pattern from SW7 down to SW0. The switches are set by the labels printed on the board, not by counting from the left. The expected values in Table 5 were produced by the same reference model that generated <font face="Menlo, monospace">alu_expected.csv</font>, so Table 1, Table 5 and the CSV cannot disagree without the model being wrong.</p>
+
+<h2>3.4 Checkpoint 3: seven operations</h2>
+<p>The manual asks how to modify the VHDL for seven operations. The clean change is to widen <i>op</i> to three bits: two bits give only four codes, and no amount of decoding creates three more. Table 6 lists the seven operations and the reserved code.</p>
+"""
+    body += table(
+        "Table 6. Operation table of the seven-operation ALU.",
+        ["op[2:0]", "Operation", "result[2:0]", "carry"],
+        [
+            ["000", "ADD", "(A + B) mod 8", "1 if A + B ≥ 8, else 0"],
+            ["001", "SUB", "(A &minus; B) mod 8", "1 if A ≥ B (no borrow), else 0"],
+            ["010", "AND", "A and B", "0"],
+            ["011", "OR", "A or B", "0"],
+            ["100", "XOR", "A xor B", "0"],
+            ["101", "SHR", "A &gt;&gt; 1", "0"],
+            ["110", "SHL", "A &lt;&lt; 1 (mod 8)", "0"],
+            ["111", "reserved", "000", "0"],
+        ],
+    )
+    body += """
+<p>The datapath grows in three places. The output select becomes an eight-to-one multiplexer. The adder is shared by ADD and SUB: subtraction is <i>A</i> + (not <i>B</i>) + 1 in two's complement, so <font face="Menlo, monospace">diff &lt;= ('0' &amp; A) + (not ('0' &amp; B)) + "0001"</font>. The shift group gains SHL, which is <font face="Menlo, monospace">A(1 downto 0) &amp; '0'</font>. AND, OR and XOR reuse the existing gates.</p>
+<p>Three details are easy to get wrong. The extra <i>op</i> bit needs a pin: SW8 is V2 on the Basys 3, and the XDC must add <font face="Menlo, monospace">op[2]</font>. The reserved code 111 should drive a defined value (000, carry 0), not <font face="Menlo, monospace">'Z'</font>. And the carry for SUB is not <font face="Menlo, monospace">diff(3)</font>; it is the inverse, because <font face="Menlo, monospace">diff(3) = 1</font> means <i>A</i> &lt; <i>B</i> and therefore a borrow. The expression <font face="Menlo, monospace">not diff(3)</font> is the no-borrow flag.</p>
+<p>The seven-operation testbench uses different operands in each segment so that the seven results are distinct: 001, 101, 100, 111, 011, 010, 110. That makes a swapped <i>op</i> connection obvious. The full design is in <font face="Menlo, monospace">alu_7ops.vhd</font> and its testbench in <font face="Menlo, monospace">alu_7ops_tb.vhd</font>; the listing below shows the operation selection and the carry selection.</p>
+"""
+    seven_ops = """    signal sum  : STD_LOGIC_VECTOR (3 downto 0);
+    signal diff : STD_LOGIC_VECTOR (3 downto 0);
+begin
+    sum  <= ('0' & A) + ('0' & B);
+    diff <= ('0' & A) + (not ('0' & B)) + "0001";
+
+    with op select
+        result_t <= sum(2 downto 0)              when "000",
+                    diff(2 downto 0)             when "001",
+                    A and B                      when "010",
+                    A or B                       when "011",
+                    A xor B                      when "100",
+                    to_stdlogicvector(to_bitvector(A) srl 1) when "101",
+                    A(1 downto 0) & '0'          when "110",
+                    "000"                        when others;
+
+    with op select
+        carry_t <= sum(3)     when "000",
+                   not diff(3) when "001",
+                   '0'         when others;"""
+    body += listing_text(seven_ops, "Listing 3. Operation and carry selection in the seven-operation ALU (excerpt).", "long")
+    body += figure("figs/fig_7ops.svg", "Figure 4. Seven-operation datapath: one more op bit, an eight-to-one select and a shared add/sub unit.")
+
+    body += """
+<h2>3.5 Checkpoint 4: the logic analyser</h2>
+<p>Experiment 2 observes the same signals on the PMOD header. The wiring is: black to GND, brown to JA1, red to JA2, orange to JA3 and yellow to JA4. The black wire must go to a GND pin, not VCC; the PMOD pinout marks pins 5 and 11 as GND and pins 6 and 12 as VCC. A mistake here gives a flat trace, and on some analysers it can damage the input.</p>
+<p>PulseView is set to trigger on D0 rising, with 5 M samples at 1 MHz. The trigger channel is JA1 = <font face="Menlo, monospace">dup_result[0]</font>, the LSB of the result. With <i>B</i> = 000 and op = 00, the result equals <i>A</i>, so D0 is <i>A</i>(0); it rises every time <i>A</i> goes from even to odd. That edge starts the capture.</p>
+"""
+    body += table(
+        "Table 7. Logic-analyser channels.",
+        ["Analyser channel", "JA pin", "ALU signal", "Meaning"],
+        [
+            ["D0", "JA1", "dup_result[0]", "result LSB"],
+            ["D1", "JA2", "dup_result[1]", "result bit 1"],
+            ["D2", "JA3", "dup_result[2]", "result MSB"],
+            ["D3", "JA4", "dup_carry", "carry"],
+        ],
+    )
+    body += """
+<p>Figure 5 is the expected capture. The first eight steps sweep <i>A</i> from 000 to 111 with <i>B</i> = 000. D0 toggles at every step, D1 at every second step, D2 at every fourth step, and D3 stays 0. The last two steps set <i>B</i> = 001 and <i>A</i> = 111; 7 + 1 = 8 gives <i>result</i> = 000 and <i>carry</i> = 1, so D3 goes high while D0&ndash;D2 fall. That is the one place where the carry appears in the capture.</p>
+"""
+    body += figure("figs/fig_cp4.svg", "Figure 5. Expected logic-analyser capture: A swept 000–111 with B = 000, then B = 001 with A = 111.")
+    body += """
+<p>The manual's text says 5 M samples at 1 MHz, while the screenshot on page 10 shows 1 M samples at 20 kHz. Both are valid: 5 M at 1 MHz gives a 5 s window with 1 &micro;s resolution; 1 M at 20 kHz gives a 50 s window with 50 &micro;s resolution. The slower setting is easier for a hand sweep; the faster one is needed if the switches are changed quickly. The guide gives both settings so the choice can be made at the bench.</p>
+<p>One limitation of the vector figure: it is an idealised capture. A real capture shows switch bounce as short bursts at each edge, because the analyser is fast enough to record it. The bounce is not an ALU fault. If the trace looks like a staircase with extra narrow pulses at the steps, that is the switch, not the logic.</p>
+
+<h2>3.6 Problems to watch for</h2>
+<p>Several errors are easy to make in this flow, and each one points to a different part. They are recorded here because the fix is more useful than the final listing.</p>
+<ul>
+<li><b>Positional port map.</b> A testbench that maps by position still elaborates after the entity is reordered, but <i>result</i> can end up connected to <i>carry</i>. Named association makes the waveform trustworthy.</li>
+<li><b>Missing final wait.</b> Without a <font face="Menlo, monospace">wait;</font> at the end, the process repeats and the waveform shows mostly the last segment. The final wait stops the process after the four segments.</li>
+<li><b>Shift on the wrong type.</b> <font face="Menlo, monospace">A srl 1</font> on a <font face="Menlo, monospace">STD_LOGIC_VECTOR</font> does not compile. The <font face="Menlo, monospace">to_bitvector</font> / <font face="Menlo, monospace">to_stdlogicvector</font> pair fixes it.</li>
+<li><b>XDC names.</b> Writing <font face="Menlo, monospace">A0</font>, <font face="Menlo, monospace">A1</font>, <font face="Menlo, monospace">A2</font> instead of <font face="Menlo, monospace">A[0]</font>, <font face="Menlo, monospace">A[1]</font>, <font face="Menlo, monospace">A[2]</font> leaves the ports unplaced at implementation.</li>
+<li><b>Tristate default.</b> Copying <font face="Menlo, monospace">"ZZZZ"</font> from the manual's decoder example makes synthesis warn about a tristate; a concrete default removes the warning and the inferred buffer.</li>
+<li><b>GND on the analyser.</b> A flat capture usually means the black wire is on the VCC pin. Moving it to GND and checking the PMOD pinout fixes it.</li>
+<li><b>Trigger edge.</b> A falling-edge trigger starts the capture at the end of the sweep. The rising edge matches the JA1 behaviour and starts at the first even-to-odd step.</li>
+</ul>
+
+<h1>4. Conclusions</h1>
+<p>The ALU meets the four-operation specification. The design is purely combinational, the carry is correct for addition, the logic operations force the carry to 0, and the shift is logical. The duplicate outputs make the internal values visible on JA without changing the logic. The testbench drives four distinct results, and the board table covers the carry cases that are easy to misread.</p>
+<p>The most useful part of the exercise was not the arithmetic; it was the discipline of fixing the behaviour in a table before writing VHDL and then checking the table against a testbench. The four-bit sum with <font face="Menlo, monospace">tmp(3)</font> as the carry is a small trick, but it removed a separate carry equation and made the addition and the carry provably consistent. The shift conversion was the first time in the course where the type of a signal changed the operators that were available, and the explicit conversion is clearer than a comment claiming that the shift is logical.</p>
+<p>Checkpoint 3 showed that the same structure extends to seven operations with a wider select and a shared add/sub unit; the main cost is one more switch and a wider XDC. The reserved code is a reminder that widening an operation code always creates codes that must be defined, and that <font face="Menlo, monospace">when others</font> is the place to define them.</p>
+<p>The design is ready for the board session. The remaining work is to confirm the ten cases in Table 5 and capture the logic-analyser trace; the report's figures are vector redraws so that the values stay legible, and the guide lists the screenshots to add. The full source, the constraints, the project script and the expected-value CSV are in the same repository as this report.</p>
+"""
+    return page("J8 Laboratory Report 3 — A Simple 3-bit ALU", body, "en")
+
+
+# ---------------------------------------------------------------------------
+def main() -> None:
+    out = HERE / "report_en.html"
+    out.write_text(report_en(), encoding="utf-8")
+    print(f"wrote {out}")
+
+
+if __name__ == "__main__":
+    main()

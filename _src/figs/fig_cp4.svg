@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 420" width="840" height="420" role="img" aria-label="Logic analyser capture">
+<title>Logic analyser capture</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#111111"/></marker><marker id="arrowm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/></marker></defs>
+<rect x="0" y="0" width="840" height="420" fill="#ffffff"/>
+<rect x="120" y="55" width="67.0" height="285" rx="2" fill="#f0f0f0" stroke="none" stroke-width="1.1"/>
+<text x="20" y="84" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">D0  JA1  result[0]</text>
+<line x1="120" y1="90" x2="790" y2="90" stroke="#dddddd" stroke-width="0.6"/>
+<line x1="120.0" y1="89" x2="187.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="71" x2="254.0" y2="71" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="71" x2="187.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="254.0" y1="89" x2="321.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<line x1="254.0" y1="71" x2="254.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="321.0" y1="71" x2="388.0" y2="71" stroke="#111111" stroke-width="1.3"/>
+<line x1="321.0" y1="71" x2="321.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="388.0" y1="89" x2="455.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="71" x2="388.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="455.0" y1="71" x2="522.0" y2="71" stroke="#111111" stroke-width="1.3"/>
+<line x1="455.0" y1="71" x2="455.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="522.0" y1="89" x2="589.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<line x1="522.0" y1="71" x2="522.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="589.0" y1="71" x2="656.0" y2="71" stroke="#111111" stroke-width="1.3"/>
+<line x1="589.0" y1="71" x2="589.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="656.0" y1="89" x2="723.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="71" x2="656.0" y2="89" stroke="#111111" stroke-width="1.2"/>
+<line x1="723.0" y1="89" x2="790.0" y2="89" stroke="#111111" stroke-width="1.3"/>
+<text x="20" y="149" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">D1  JA2  result[1]</text>
+<line x1="120" y1="155" x2="790" y2="155" stroke="#dddddd" stroke-width="0.6"/>
+<line x1="120.0" y1="154" x2="187.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="154" x2="254.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<line x1="254.0" y1="136" x2="321.0" y2="136" stroke="#111111" stroke-width="1.3"/>
+<line x1="254.0" y1="136" x2="254.0" y2="154" stroke="#111111" stroke-width="1.2"/>
+<line x1="321.0" y1="136" x2="388.0" y2="136" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="154" x2="455.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="136" x2="388.0" y2="154" stroke="#111111" stroke-width="1.2"/>
+<line x1="455.0" y1="154" x2="522.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<line x1="522.0" y1="136" x2="589.0" y2="136" stroke="#111111" stroke-width="1.3"/>
+<line x1="522.0" y1="136" x2="522.0" y2="154" stroke="#111111" stroke-width="1.2"/>
+<line x1="589.0" y1="136" x2="656.0" y2="136" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="154" x2="723.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="136" x2="656.0" y2="154" stroke="#111111" stroke-width="1.2"/>
+<line x1="723.0" y1="154" x2="790.0" y2="154" stroke="#111111" stroke-width="1.3"/>
+<text x="20" y="214" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">D2  JA3  result[2]</text>
+<line x1="120" y1="220" x2="790" y2="220" stroke="#dddddd" stroke-width="0.6"/>
+<line x1="120.0" y1="219" x2="187.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="219" x2="254.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<line x1="254.0" y1="219" x2="321.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<line x1="321.0" y1="219" x2="388.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="201" x2="455.0" y2="201" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="201" x2="388.0" y2="219" stroke="#111111" stroke-width="1.2"/>
+<line x1="455.0" y1="201" x2="522.0" y2="201" stroke="#111111" stroke-width="1.3"/>
+<line x1="522.0" y1="201" x2="589.0" y2="201" stroke="#111111" stroke-width="1.3"/>
+<line x1="589.0" y1="201" x2="656.0" y2="201" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="219" x2="723.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="201" x2="656.0" y2="219" stroke="#111111" stroke-width="1.2"/>
+<line x1="723.0" y1="219" x2="790.0" y2="219" stroke="#111111" stroke-width="1.3"/>
+<text x="20" y="294" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="10" fill="#111111">D3  JA4  carry</text>
+<line x1="120" y1="300" x2="790" y2="300" stroke="#dddddd" stroke-width="0.6"/>
+<line x1="120.0" y1="299" x2="187.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="299" x2="254.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="254.0" y1="299" x2="321.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="321.0" y1="299" x2="388.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="388.0" y1="299" x2="455.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="455.0" y1="299" x2="522.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="522.0" y1="299" x2="589.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="589.0" y1="299" x2="656.0" y2="299" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="281" x2="723.0" y2="281" stroke="#111111" stroke-width="1.3"/>
+<line x1="656.0" y1="281" x2="656.0" y2="299" stroke="#111111" stroke-width="1.2"/>
+<line x1="723.0" y1="281" x2="790.0" y2="281" stroke="#111111" stroke-width="1.3"/>
+<line x1="187.0" y1="55" x2="187.0" y2="340" stroke="#b00020" stroke-width="1.2" stroke-dasharray="5,3"/>
+<text x="191.0" y="50" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#b00020">D0 rising = trigger</text>
+<text x="100" y="380" text-anchor="end" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#555555">A =</text>
+<text x="153.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">0</text>
+<text x="220.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">1</text>
+<text x="287.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">2</text>
+<text x="354.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">3</text>
+<text x="421.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">4</text>
+<text x="488.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">5</text>
+<text x="555.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">6</text>
+<text x="622.5" y="380" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9.5" fill="#555555">7</text>
+<text x="388.0" y="398" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#111111" font-style="italic">A sweeps 000 → 111, B = 000</text>
+<text x="723.0" y="398" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#111111" font-style="italic">B = 001, A = 111</text>
+<line x1="120.0" y1="342" x2="120.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="120.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">0</text>
+<line x1="187.0" y1="342" x2="187.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="187.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">1</text>
+<line x1="254.0" y1="342" x2="254.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="254.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">2</text>
+<line x1="321.0" y1="342" x2="321.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="321.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">3</text>
+<line x1="388.0" y1="342" x2="388.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="388.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">4</text>
+<line x1="455.0" y1="342" x2="455.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="455.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">5</text>
+<line x1="522.0" y1="342" x2="522.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="522.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">6</text>
+<line x1="589.0" y1="342" x2="589.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="589.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">7</text>
+<line x1="656.0" y1="342" x2="656.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="656.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">8</text>
+<line x1="723.0" y1="342" x2="723.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="723.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">9</text>
+<line x1="790.0" y1="342" x2="790.0" y2="350" stroke="#111111" stroke-width="0.8"/>
+<text x="790.0" y="360" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">10</text>
+<text x="796" y="360" text-anchor="start" font-family="Times New Roman, Songti SC, serif" font-size="8.5" fill="#555555">ms</text>
+<text x="420" y="416" text-anchor="middle" font-family="Times New Roman, Songti SC, serif" font-size="9" fill="#555555" font-style="italic">5 M samples at 1 MHz = 5 s window; the sketch shows the first 10 ms.</text>
+</svg>

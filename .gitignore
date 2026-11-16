@@ -1,0 +1,28 @@
+# Original course manual — keep local, do not publish
+EE2000_Lab3.pdf
+
+# Vivado / Xilinx project files
+*.jou
+*.log
+*.str
+*.bit
+*.dcp
+*.rpt
+*.xpr
+*.xpr.*
+.Xil/
+lab3_alu/
+*.cache/
+*.hw/
+*.sim/
+*.ip_user_files/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Local QA scratch
+_src/figtest.html
