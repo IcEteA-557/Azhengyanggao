@@ -495,10 +495,10 @@ def guide_zh() -> str:
 
 <h1>3. 开工前 10 分钟</h1>
 <h2>3.1 把文件放好</h2>
-<p>从 GitHub 仓库下载整个 <code>lab3</code> 文件夹（或 <code>git clone</code>），确认下面这些文件都在：</p>
+<p>确认 <code>lab3</code> 文件夹里下面这些文件都在：</p>
 """
     body += table(
-        "表 2. 仓库里每个文件是干什么的。",
+        "表 2. lab3 里每个文件是干什么的。",
         ["文件", "用途", "今晚什么时候用"],
         [
             ["EE2000_Lab3_中文版.pdf", "中文实验手册", "到场前/现场查要求"],
@@ -529,37 +529,8 @@ def guide_zh() -> str:
     body += figure("figs/fig_board.svg", "图 2. Basys 3 的开关、LED 和 JA 排针；A 在 SW0–SW2，B 在 SW3–SW5，op 在 SW6–SW7。")
 
     body += """
-<h1>4. GitHub 仓库怎么用</h1>
-<p>仓库地址：<a href="https://github.com/IcEteA-557/Azhengyanggao">https://github.com/IcEteA-557/Azhengyanggao</a>。仓库是公开的，里面就是 <code>lab3</code> 的全套文件。今晚在实验室里最稳的做法是提前把整个文件夹下载到本机（GitHub 页面 → Code → Download ZIP），不要依赖实验室网络。</p>
-<h2>4.1 第一次把文件推上去</h2>
-<p>如果仓库还是空的，在 <code>lab3</code> 文件夹里执行（方案 A，推荐：仓库根目录就是 lab3 的内容，GitHub 首页会直接显示 README）：</p>
-<pre class="code">cd lab3
-git init
-git add .
-git commit -m "J8 Lab 3: ALU design, reports and guide"
-git branch -M main
-git remote add origin https://github.com/IcEteA-557/Azhengyanggao.git
-git push -u origin main</pre>
-<p>如果你想把整个 <code>lab</code>（包含 lab1、lab2、lab3）作为一个仓库（方案 B）：</p>
-<pre class="code">cd lab
-git init
-git add lab3
-git commit -m "J8 Lab 3"
-git branch -M main
-git remote add origin https://github.com/IcEteA-557/Azhengyanggao.git
-git push -u origin main</pre>
-<p>方案 B 的仓库首页不会自动显示 <code>lab3/README.md</code>，需要点进 <code>lab3</code> 才能看到；方案 A 更适合“今晚给同学/自己看”的用法。两种方案里 README 的相对链接都能用，因为 README 与 <code>src/</code>、PDF 在同一层。</p>
-<div class="warn"><b>公开仓库提醒：</b>报告封面有学号 91786767，中文手册里含有课程手册的原始截图。如果不想公开这些内容，可以把仓库改成 private，或删除中文手册 PDF、把学号改成占位符后再推。不要把 Vivado 的工程缓存（<code>.Xil/</code>、<code>*.jou</code>、<code>*.log</code>、<code>*.bit</code>）一起提交；仓库里的 <code>.gitignore</code> 已经排除了它们。</div>
-<h2>4.2 现场怎么用仓库</h2>
-<ul>
-<li>只看要求：打开 <code>EE2000_Lab3_中文版.pdf</code> 或本指南。</li>
-<li>建工程：用 <code>src/create_project.tcl</code>，或手动加 <code>src/alu.vhd</code>、<code>src/alu_tb.vhd</code>、<code>src/alu.xdc</code>。</li>
-<li>写报告：直接以 <code>EE2000_Lab3_Report_中文版.pdf</code> 为底稿，把“预期”改成实测，补自己的截图。</li>
-<li>检查点 3：<code>src/alu_7ops.vhd</code> 和报告里的表 6、代码清单 3 已经写好，照着讲即可。</li>
-</ul>
-
-<h1>5. 检查点 1：仿真</h1>
-<h2>5.1 跑起来</h2>
+<h1>4. 检查点 1：仿真</h1>
+<h2>4.1 跑起来</h2>
 <ol>
 <li>在 Sources 面板把 <code>alu_tb</code> 设为 Simulation Top（右键 → Set as Top），或在 Tcl Console 执行 <code>set_property top alu_tb [get_filesets sim_1]</code>。</li>
 <li>Flow → Run Simulation → Run Behavioral Simulation；或执行 <code>launch_simulation</code>、<code>run all</code>。</li>
@@ -578,20 +549,20 @@ git push -u origin main</pre>
         ],
     )
     body += """
-<h2>5.2 要截什么图</h2>
+<h2>4.2 要截什么图</h2>
 <p>截两张：一张是 <code>alu_tb.vhd</code> 的代码窗口（能看出四段 <code>wait for 10 ns</code>），一张是完整波形窗口（能看出四段结果和 carry）。文件名建议 <code>cp1_tb.png</code>、<code>cp1_waveform.png</code>。如果演示者只看一张，就给波形，但要能指着说“这一段是 ADD，carry 在这里为 1”。</p>
 <div class="say"><b>演示时这样说：</b>“这是测试平台，四段激励分别是 ADD、AND、XOR、SHR。A 固定为 101、B 固定为 011，所以结果依次是 000 带进位 1、001、110、010。carry 只在加法段为 1；dup_result 和 dup_carry 是给 JA 的副本，和主输出完全一致。”</div>
 <p>如果被问“为什么不用随机激励”：四段定值是为了让四个结果互不相同，操作码接反时一眼能看出来；随机激励适合跑覆盖率，不适合 30 秒演示。</p>
 
-<h1>6. 检查点 2：上板</h1>
-<h2>6.1 生成并下载</h2>
+<h1>5. 检查点 2：上板</h1>
+<h2>5.1 生成并下载</h2>
 <ol>
 <li>Flow → Run Synthesis；完成后 Run Implementation；再 Generate Bitstream。</li>
 <li>Open Hardware Manager → Open Target → Auto Connect。</li>
 <li>Program Device，选择 <code>lab3_alu.bit</code>，点 Program。</li>
 <li>如果 Auto Connect 找不到板子：确认板子电源开关、USB 线是数据线而不是仅充电线、Vivado 的 cable driver 已安装；Windows 下可能需要装 Digilent 的 cable driver。</li>
 </ol>
-<h2>6.2 测这 10 组</h2>
+<h2>5.2 测这 10 组</h2>
 <p>按表 4 拨开关。开关模式按 SW7 到 SW0 写，具体哪个物理开关对应哪一位，以板上印的标签为准；不要从左往右数。每测完一组，在“实测”一栏打勾，并在报告里把“预期”改成你实际看到的模式。</p>
 """
     body += table(
@@ -620,7 +591,7 @@ git push -u origin main</pre>
 <div class="say"><b>演示时这样说：</b>“这是下载后的板子。A 在 SW0–SW2，B 在 SW3–SW5，op 在 SW6–SW7；LD0–LD2 是结果，LD3 是进位。这一组是 7+1，结果是 000、进位 1，所以 LED 显示 1000。这一组是 7+7，结果是 110、进位 1，显示 1110。”</div>
 <p>如果被问“为什么 7+1 的 LED 不是 0000”：因为 LD3 接的是 carry，不是 result 的第四位；result 只有三位。</p>
 
-<h1>7. 检查点 3：报告里的七种运算</h1>
+<h1>6. 检查点 3：报告里的七种运算</h1>
 <p>这一项不现场演示，但要写在报告里。最简单的答法是：把 <code>op</code> 从 2 位扩到 3 位，输出选择从四选一变成八选一，加法器由 ADD 和 SUB 共用，移位组增加 SHL，保留编码 111 输出 000。</p>
 """
     body += table(
@@ -649,8 +620,8 @@ git push -u origin main</pre>
     body += figure("figs/fig_7ops.svg", "图 3. 七运算数据通路：多一位 op、八选一、共用加减法单元。")
 
     body += """
-<h1>8. 检查点 4：逻辑分析仪</h1>
-<h2>8.1 接线</h2>
+<h1>7. 检查点 4：逻辑分析仪</h1>
+<h2>7.1 接线</h2>
 <p>先把板子设成 <i>A</i> = 000、<i>B</i> = 000、<i>op</i> = 00，再接线。接线顺序：</p>
 <ol>
 <li>黑线 → GND（PMOD 的 5 或 11 脚；不要接 6/12 脚的 VCC）。</li>
@@ -661,7 +632,7 @@ git push -u origin main</pre>
 """
     body += figure("figs/manual/pmod_pinout.png", "图 4. PMOD 引脚：5/11 是 GND，6/12 是 VCC，中间 8 个是信号。")
     body += """
-<h2>8.2 PulseView 设置</h2>
+<h2>7.2 PulseView 设置</h2>
 <ol>
 <li>打开 PulseView，选择设备（常见的是 <code>fx2lafw</code> 兼容的逻辑分析仪）。</li>
 <li>通道只开 D0–D3，分别对应 JA1–JA4。</li>
@@ -683,7 +654,7 @@ git push -u origin main</pre>
         ],
     )
     body += """
-<h2>8.3 波形应该是什么样</h2>
+<h2>7.3 波形应该是什么样</h2>
 <p>前八步 <i>B</i> = 000，结果等于 <i>A</i>：D0 每步翻转，D1 每两步翻转，D2 每四步翻转，D3 一直是 0。最后一步 <i>A</i> = 111、<i>B</i> = 001，7 + 1 = 8，结果 000、进位 1，所以 D3 变高、D0–D2 变低。</p>
 """
     body += figure("figs/fig_cp4.svg", "图 6. 预期采集：A 从 000 到 111（B=000），然后 B=001、A=111。")
@@ -691,7 +662,7 @@ git push -u origin main</pre>
 <div class="say"><b>演示时这样说：</b>“黑线接 GND，棕红橙黄分别接 JA1–JA4。PulseView 用 D0 上升沿触发、1 MHz 采样、5 M 点。D0 是结果最低位，所以 A 每加一它就翻转；D1 每两步、D2 每四步翻转。最后 7+1=8 时，D3 进位变高，D0–D2 变低。”</div>
 <p>如果被问“为什么要触发”：手拨开关的时刻不确定，触发让采集从 JA1 的上升沿开始，波形才有稳定的起点；预触发样本还能看到触发前的一小段。</p>
 
-<h1>9. 故障排查</h1>
+<h1>8. 故障排查</h1>
 """
     body += table(
         "表 7. 常见现象与处理。",
@@ -715,7 +686,7 @@ git push -u origin main</pre>
     )
 
     body += """
-<h1>10. 进实验室前自查</h1>
+<h1>9. 进实验室前自查</h1>
 <ul class="checklist">
 <li>☐ 中文手册和本指南已下载到本机，能离线打开。</li>
 <li>☐ Vivado 工程能打开，器件是 xc7a35tcpg236-1，alu.vhd / alu_tb.vhd / alu.xdc 都在。</li>
@@ -726,7 +697,7 @@ git push -u origin main</pre>
 <li>☐ 记得带学生证；报告封面要填姓名、学号、日期。</li>
 </ul>
 
-<h1>11. 交报告前检查</h1>
+<h1>10. 交报告前检查</h1>
 <ul class="checklist">
 <li>☐ 封面：IcEteA So Handsome、91786767、2026 年 11 月 16 日（或实际提交日期）。</li>
 <li>☐ 表 1、2、4、5、6、7 都在，编号连续。</li>
